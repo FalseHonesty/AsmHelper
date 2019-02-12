@@ -1,0 +1,71 @@
+
+// For those who want the bleeding edge
+buildscript {
+    ext.kotlin_version = "1.3.21"
+
+    repositories {
+        jcenter()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+apply plugin: "kotlin"
+apply plugin: 'net.minecraftforge.gradle.forge'
+
+version = "1.0"
+group= "me.falsehonesty.asmhelper"
+archivesBaseName = "AsmHelper"
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+minecraft {
+    version = "1.8.9-11.15.1.1902-1.8.9"
+    runDir = "run"
+
+    mappings = "stable_20"
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+}
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+
+        expand 'version':project.version, 'mcversion':project.minecraft.version
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+jar {
+    from configurations.provided.asFileTree.files.collect {
+        zipTree(it)
+    }
+
+    manifest {
+        attributes "ModSide": "CLIENT"
+    }
+
+}
+configurations {
+    provided
+    // Make compile extend from our provided configuration so that things added to bundled end up on the compile classpath
+    compile.extendsFrom(provided)
+}
