@@ -1,4 +1,4 @@
-package me.falsehonesty.asmhelper.dsl
+package me.falsehonesty.asmhelper.dsl.instructions
 
 import me.falsehonesty.asmhelper.AsmHelper
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper

@@ -1,5 +1,6 @@
-package me.falsehonesty.asmhelper.dsl
+package me.falsehonesty.asmhelper.dsl.instructions
 
+import me.falsehonesty.asmhelper.dsl.writers.InjectWriter
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.*
 
@@ -66,7 +67,7 @@ enum class JumpCondition(val opcode: Int) {
     NON_NULL(Opcodes.IFNONNULL)
 }
 
-fun AsmWriter.Builder.insnList(config: InsnListBuilder.() -> Unit) {
+fun InjectWriter.Builder.insnList(config: InsnListBuilder.() -> Unit) {
     val builder = InsnListBuilder()
     builder.config()
 

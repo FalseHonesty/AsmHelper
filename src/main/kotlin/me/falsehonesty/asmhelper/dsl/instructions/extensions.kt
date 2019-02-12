@@ -1,4 +1,4 @@
-package me.falsehonesty.asmhelper.dsl
+package me.falsehonesty.asmhelper.dsl.instructions
 
 inline fun InsnListBuilder.ifClause(cond: JumpCondition, config: InsnListBuilder.() -> Unit) {
     val label = makeLabel()

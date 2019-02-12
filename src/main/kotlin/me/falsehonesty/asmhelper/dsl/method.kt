@@ -2,15 +2,12 @@
 package me.falsehonesty.asmhelper.dsl
 
 import me.falsehonesty.asmhelper.AsmHelper
+import me.falsehonesty.asmhelper.dsl.writers.InjectWriter
 
-fun inject(config: AsmWriter.Builder.() -> Unit) {
-    val writer = AsmWriter.Builder(MethodType.INJECT)
+fun inject(config: InjectWriter.Builder.() -> Unit) {
+    val writer = InjectWriter.Builder()
 
     writer.config()
 
     AsmHelper.asmWriters.add(writer.build())
-}
-
-enum class MethodType {
-    INJECT
 }

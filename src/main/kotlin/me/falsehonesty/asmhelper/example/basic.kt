@@ -1,6 +1,9 @@
 package me.falsehonesty.asmhelper.example
 
-import me.falsehonesty.asmhelper.dsl.*
+import me.falsehonesty.asmhelper.dsl.At
+import me.falsehonesty.asmhelper.dsl.InjectionPoint
+import me.falsehonesty.asmhelper.dsl.inject
+import me.falsehonesty.asmhelper.dsl.instructions.*
 
 fun test() {
     inject {
@@ -32,6 +35,15 @@ fun test() {
                 iload(1)
                 iload(2)
             }
+
+            field {
+                type = FieldType.PUT_FIELD
+                owner = "net/minecraft/client/entity/AbstractClientPlayer"
+                name = "abstractClientPlayerHook"
+                desc = "Lio/framesplus/hook/AbstractClientPlayerHook;"
+            }
         }
     }
+
+    println("E")
 }
