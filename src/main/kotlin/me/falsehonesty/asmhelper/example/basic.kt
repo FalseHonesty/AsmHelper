@@ -18,15 +18,15 @@ fun test() {
             bipush(100)
             isub()
 
-            method {
-                type = InvokeType.VIRTUAL
-                owner = "net/minecraft/client/gui/inventory/GuiContainer"
-                name = "checkHotbarKeys"
-                desc = "(I)Z"
-            }
+            invoke(
+                InvokeType.VIRTUAL,
+                "net/minecraft/client/gui/inventory/GuiContainer",
+                "checkHotbarKeys",
+                "(I)Z"
+            )
 
             ifClause(JumpCondition.NOT_EQUAL) {
-                return_()
+                methodReturn()
             }
 
             createInstance("e/e/", "()V")
@@ -36,12 +36,12 @@ fun test() {
                 iload(2)
             }
 
-            field {
-                type = FieldType.PUT_FIELD
-                owner = "net/minecraft/client/entity/AbstractClientPlayer"
-                name = "abstractClientPlayerHook"
-                desc = "Lio/framesplus/hook/AbstractClientPlayerHook;"
-            }
+            field(
+                FieldAction.PUT_FIELD,
+                "net/minecraft/client/entity/AbstractClientPlayer",
+                "abstractClientPlayerHook",
+                "Lio/framesplus/hook/AbstractClientPlayerHook;"
+            )
         }
     }
 

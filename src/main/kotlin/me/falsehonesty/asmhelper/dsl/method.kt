@@ -2,6 +2,7 @@
 package me.falsehonesty.asmhelper.dsl
 
 import me.falsehonesty.asmhelper.AsmHelper
+import me.falsehonesty.asmhelper.dsl.writers.FieldWriter
 import me.falsehonesty.asmhelper.dsl.writers.InjectWriter
 import me.falsehonesty.asmhelper.dsl.writers.OverwriteWriter
 
@@ -20,6 +21,14 @@ fun inject(config: InjectWriter.Builder.() -> Unit) {
 
 fun overwrite(config: OverwriteWriter.Builder.() -> Unit) {
     val writer = OverwriteWriter.Builder()
+
+    writer.config()
+
+    AsmHelper.asmWriters.add(writer.build())
+}
+
+fun applyField(config: FieldWriter.Builder.() -> Unit) {
+    val writer = FieldWriter.Builder()
 
     writer.config()
 

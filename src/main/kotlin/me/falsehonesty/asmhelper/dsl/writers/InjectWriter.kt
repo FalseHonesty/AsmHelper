@@ -3,6 +3,7 @@ package me.falsehonesty.asmhelper.dsl.writers
 import me.falsehonesty.asmhelper.dsl.AsmWriter
 import me.falsehonesty.asmhelper.dsl.At
 import me.falsehonesty.asmhelper.dsl.InjectionPoint
+import me.falsehonesty.asmhelper.dsl.instructions.InsnListBuilder
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.InsnList
@@ -23,7 +24,7 @@ class InjectWriter(
     private fun injectInsnList(method: MethodNode) {
         var node = when (at.value) {
             InjectionPoint.HEAD -> method.instructions.first
-            InjectionPoint.TAIL -> method.instructions.last
+            InjectionPoint.TAIL -> method.instructions.last.previous
         }
 
         if (at.shift < 0) {
@@ -44,7 +45,7 @@ class InjectWriter(
     }
 
     override fun toString(): String {
-        return "AsmWriter{className=$className, methodName=$methodName, at=$at"
+        return "AsmWriter{className=$className, methodName=$methodName, at=$at}"
     }
 
     class Builder {
@@ -61,6 +62,13 @@ class InjectWriter(
                 at ?: throw IllegalStateException("at must NOT be null."),
                 insnListData ?: throw IllegalStateException("insnListData must NOT be null.")
             )
+        }
+
+        fun insnList(config: InsnListBuilder.() -> Unit) {
+            val builder = InsnListBuilder()
+            builder.config()
+
+            this.insnListData = builder.build()
         }
     }
 }

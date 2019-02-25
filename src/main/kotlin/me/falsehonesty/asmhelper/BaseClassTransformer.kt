@@ -1,6 +1,7 @@
 package me.falsehonesty.asmhelper
 
 import net.minecraft.launchwrapper.IClassTransformer
+import net.minecraft.launchwrapper.LaunchClassLoader
 import org.apache.logging.log4j.LogManager
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
@@ -8,7 +9,17 @@ import org.objectweb.asm.tree.ClassNode
 
 abstract class BaseClassTransformer : IClassTransformer {
     private val logger = LogManager.getLogger("AsmHelper")
-    var calledTransformers = false
+    private var calledSetup = false
+
+    private fun setup() {
+        val classLoader = this.javaClass.classLoader as LaunchClassLoader
+
+        classLoader.addTransformerExclusion("kotlin.")
+        classLoader.addTransformerExclusion("me.falsehonesty.asmhelper.")
+        classLoader.addTransformerExclusion(this.javaClass.name)
+
+        makeTransformers()
+    }
 
     /**
      * This is where you would place all of your asm helper dsl magic
@@ -19,9 +30,9 @@ abstract class BaseClassTransformer : IClassTransformer {
     override fun transform(name: String?, transformedName: String?, basicClass: ByteArray?): ByteArray? {
         if (basicClass == null) return null
 
-        if (!calledTransformers) {
-            makeTransformers()
-            calledTransformers = true
+        if (!calledSetup) {
+            setup()
+            calledSetup = true
         }
 
         AsmHelper.classReplacers[transformedName]?.let { classFile ->
@@ -33,6 +44,8 @@ abstract class BaseClassTransformer : IClassTransformer {
         val writers = AsmHelper.asmWriters
             .filter { it.className == transformedName }
             .ifEmpty { return basicClass }
+
+        logger.info("Transforming class {}", transformedName)
 
         val classReader = ClassReader(basicClass)
         val classNode = ClassNode()

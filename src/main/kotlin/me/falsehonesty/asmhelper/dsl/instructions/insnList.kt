@@ -1,6 +1,5 @@
 package me.falsehonesty.asmhelper.dsl.instructions
 
-import me.falsehonesty.asmhelper.dsl.writers.InjectWriter
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.*
 
@@ -19,12 +18,16 @@ class InsnListBuilder {
         insnList.add(VarInsnNode(Opcodes.ILOAD, value))
     }
 
+    fun iadd() {
+        insnList.add(InsnNode(Opcodes.IADD))
+    }
+
     fun ireturn() {
         insnList.add(InsnNode(Opcodes.IRETURN))
     }
 
     fun bipush(value: Int) {
-        insnList.add(VarInsnNode(Opcodes.BIPUSH, value))
+        insnList.add(IntInsnNode(Opcodes.BIPUSH, value))
     }
 
     fun isub() {
@@ -39,7 +42,11 @@ class InsnListBuilder {
         insnList.add(InsnNode(Opcodes.DUP))
     }
 
-    fun return_() {
+    fun ldc(constant: Any) {
+        insnList.add(LdcInsnNode(constant))
+    }
+
+    fun methodReturn() {
         insnList.add(InsnNode(Opcodes.RETURN))
     }
 
@@ -65,11 +72,4 @@ enum class JumpCondition(val opcode: Int) {
     LESS_OR_EQUAL(Opcodes.IFLE),
     NULL(Opcodes.IFNULL),
     NON_NULL(Opcodes.IFNONNULL)
-}
-
-fun InjectWriter.Builder.insnList(config: InsnListBuilder.() -> Unit) {
-    val builder = InsnListBuilder()
-    builder.config()
-
-    this.insnListData = builder.build()
 }

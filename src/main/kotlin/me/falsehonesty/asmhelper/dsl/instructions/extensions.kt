@@ -10,16 +10,16 @@ inline fun InsnListBuilder.ifClause(cond: JumpCondition, config: InsnListBuilder
     placeLabel(label)
 }
 
-inline fun InsnListBuilder.createInstance(className: String, description: String, parameters: InsnListBuilder.() -> Unit = {}) {
+inline fun InsnListBuilder.createInstance(className: String, constructorDescription: String, parameters: InsnListBuilder.() -> Unit = {}) {
     new(className)
     dup()
 
     this.parameters()
 
-    method {
-        type = InvokeType.SPECIAL
-        owner = className
-        name = "<init>"
-        desc = description
-    }
+    invoke(
+        InvokeType.SPECIAL,
+        className,
+        "<init>",
+        constructorDescription
+    )
 }
