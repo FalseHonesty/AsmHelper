@@ -12,7 +12,7 @@ class FieldWriter(
     private val fieldDesc: String,
     private val initialValue: Any?,
     private val initializer: InsnList?,
-    private val initializerDescriptor: String?,
+    private val initializerDesc: String?,
     private vararg val accessTypes: AccessType
 ) : AsmWriter(className) {
     override fun transform(classNode: ClassNode) {
@@ -24,9 +24,9 @@ class FieldWriter(
             initialValue
         ))
 
-        if (initializer != null && initializerDescriptor != null) {
+        if (initializer != null && initializerDesc != null) {
             val insns = classNode.methods
-                .find { it.name == "<init>" && it.desc == initializerDescriptor }
+                .find { it.name == "<init>" && it.desc == initializerDesc }
                 ?.instructions ?: return
 
             insns.insertBefore(insns.last.previous, initializer)

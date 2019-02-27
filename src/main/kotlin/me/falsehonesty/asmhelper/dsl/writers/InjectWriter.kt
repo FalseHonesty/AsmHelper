@@ -2,9 +2,9 @@ package me.falsehonesty.asmhelper.dsl.writers
 
 import me.falsehonesty.asmhelper.dsl.AsmWriter
 import me.falsehonesty.asmhelper.dsl.At
-import me.falsehonesty.asmhelper.dsl.InjectionPoint
 import me.falsehonesty.asmhelper.dsl.instructions.InsnListBuilder
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper
+import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.InsnList
 import org.objectweb.asm.tree.MethodNode
@@ -22,25 +22,28 @@ class InjectWriter(
     }
 
     private fun injectInsnList(method: MethodNode) {
-        var node = when (at.value) {
-            InjectionPoint.HEAD -> method.instructions.first
-            InjectionPoint.TAIL -> method.instructions.last.previous
-        }
+        val nodes = at.getTargetedNodes(method)
+
+        nodes.forEach { insertToNode(method, it) }
+    }
+
+    private fun insertToNode(method: MethodNode, node: AbstractInsnNode) {
+        var newNode = node
 
         if (at.shift < 0) {
             repeat(-at.shift) {
-                node = node.previous
+                newNode = node.previous
             }
         } else if (at.shift > 0) {
             repeat(at.shift) {
-                node = node.next
+                newNode = node.next
             }
         }
 
         if (at.before) {
-            method.instructions.insertBefore(node, insnList)
+            method.instructions.insertBefore(newNode, insnList)
         } else {
-            method.instructions.insert(node, insnList)
+            method.instructions.insert(newNode, insnList)
         }
     }
 

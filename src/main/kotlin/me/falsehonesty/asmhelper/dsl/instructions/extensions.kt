@@ -1,11 +1,13 @@
 package me.falsehonesty.asmhelper.dsl.instructions
 
-inline fun InsnListBuilder.ifClause(cond: JumpCondition, config: InsnListBuilder.() -> Unit) {
+import org.objectweb.asm.tree.InsnList
+
+inline fun InsnListBuilder.ifClause(cond: JumpCondition, code: InsnListBuilder.() -> Unit) {
     val label = makeLabel()
 
     jump(cond, label)
 
-    this.config()
+    this.code()
 
     placeLabel(label)
 }
@@ -22,4 +24,46 @@ inline fun InsnListBuilder.createInstance(className: String, constructorDescript
         "<init>",
         constructorDescription
     )
+}
+
+inline fun InsnListBuilder.ifElseClause(cond: JumpCondition, builder: IfElseBuilder.() -> Unit) {
+    val ifElse = IfElseBuilder()
+
+    ifElse.builder()
+
+    val ifLabel = makeLabel()
+    val endLabel = makeLabel()
+
+    jump(cond, ifLabel)
+
+    insertInsns(ifElse.elseCode)
+
+    jump(JumpCondition.GOTO, endLabel)
+
+    placeLabel(ifLabel)
+
+    insertInsns(ifElse.ifCode)
+
+    placeLabel(endLabel)
+}
+
+class IfElseBuilder {
+    var ifCode = InsnList()
+    var elseCode = InsnList()
+
+    fun ifCode(builder: InsnListBuilder.() -> Unit) {
+        val insn = InsnListBuilder()
+
+        insn.builder()
+
+        ifCode = insn.build()
+    }
+
+    fun elseCode(builder: InsnListBuilder.() -> Unit) {
+        val insn = InsnListBuilder()
+
+        insn.builder()
+
+        elseCode = insn.build()
+    }
 }

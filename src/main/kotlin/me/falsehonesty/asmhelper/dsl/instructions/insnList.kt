@@ -10,6 +10,10 @@ class InsnListBuilder {
         insnList.add(VarInsnNode(Opcodes.ALOAD, value))
     }
 
+    fun aconst_null() {
+        insnList.add(InsnNode(Opcodes.ACONST_NULL))
+    }
+
     fun areturn() {
         insnList.add(InsnNode(Opcodes.ARETURN))
     }
@@ -28,6 +32,27 @@ class InsnListBuilder {
 
     fun bipush(value: Int) {
         insnList.add(IntInsnNode(Opcodes.BIPUSH, value))
+    }
+
+    /**
+     * An abstraction over iconst, bipush, sipush, and ldc, picking the best one
+     * available.
+     */
+    fun num(number: Int) {
+        when (number) {
+            -1 -> insnList.add(InsnNode(Opcodes.ICONST_M1))
+            0 -> insnList.add(InsnNode(Opcodes.ICONST_0))
+            1 -> insnList.add(InsnNode(Opcodes.ICONST_1))
+            2 -> insnList.add(InsnNode(Opcodes.ICONST_2))
+            3 -> insnList.add(InsnNode(Opcodes.ICONST_3))
+            4 -> insnList.add(InsnNode(Opcodes.ICONST_4))
+            5 -> insnList.add(InsnNode(Opcodes.ICONST_5))
+            in 6..127 -> insnList.add(IntInsnNode(Opcodes.BIPUSH, number))
+            in -127..-2 -> insnList.add(IntInsnNode(Opcodes.BIPUSH, number))
+            in 128..32768 -> insnList.add(IntInsnNode(Opcodes.SIPUSH, number))
+            in -32768..-128 -> insnList.add(IntInsnNode(Opcodes.SIPUSH, number))
+            else -> ldc(number)
+        }
     }
 
     fun isub() {
@@ -60,6 +85,10 @@ class InsnListBuilder {
         insnList.add(label)
     }
 
+    fun insertInsns(list: InsnList) {
+        insnList.add(list)
+    }
+
     fun build(): InsnList = insnList
 }
 
@@ -71,5 +100,6 @@ enum class JumpCondition(val opcode: Int) {
     GREATER_THAN(Opcodes.IFGT),
     LESS_OR_EQUAL(Opcodes.IFLE),
     NULL(Opcodes.IFNULL),
-    NON_NULL(Opcodes.IFNONNULL)
+    NON_NULL(Opcodes.IFNONNULL),
+    GOTO(Opcodes.GOTO)
 }

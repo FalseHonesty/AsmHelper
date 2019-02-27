@@ -42,6 +42,16 @@ fun test() {
                 "abstractClientPlayerHook",
                 "Lio/framesplus/hook/AbstractClientPlayerHook;"
             )
+
+            ifElseClause(JumpCondition.EQUAL) {
+                ifCode {
+
+                }
+
+                elseCode {
+
+                }
+            }
         }
     }
 
