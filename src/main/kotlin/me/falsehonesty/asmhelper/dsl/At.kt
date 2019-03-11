@@ -1,7 +1,7 @@
 package me.falsehonesty.asmhelper.dsl
 
-import jdk.internal.org.objectweb.asm.Opcodes
 import me.falsehonesty.asmhelper.dsl.instructions.Descriptor
+import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode

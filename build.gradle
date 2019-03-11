@@ -22,16 +22,16 @@ apply plugin: "kotlin"
 apply plugin: 'net.minecraftforge.gradle.forge'
 
 version = "1.0"
-group= "me.falsehonesty.asmhelper"
+group = "me.falsehonesty.asmhelper"
 archivesBaseName = "AsmHelper"
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 minecraft {
-    version = "1.8.9-11.15.1.1902-1.8.9"
+    version = "1.8.9-11.15.1.2318-1.8.9"
     runDir = "run"
 
-    mappings = "stable_20"
+    mappings = "stable_22"
 }
 
 repositories {
@@ -58,12 +58,19 @@ processResources {
 }
 jar {
     manifest {
-        attributes "ModSide": "CLIENT", "FMLCorePlugin": "me.falsehonesty.asmhelpermod.core.AsmHelperLoadingPlugin"
+        attributes "ModSide": "CLIENT"//, "FMLCorePlugin": "me.falsehonesty.asmhelpermod.core.AsmHelperLoadingPlugin"
     }
-
 }
 configurations {
     provided
     // Make compile extend from our provided configuration so that things added to bundled end up on the compile classpath
     compile.extendsFrom(provided)
+}
+sourceSets {
+    main {
+        kotlin {
+            exclude 'me/falsehonesty/asmhelper/example/**'
+            exclude 'me/falsehonesty/asmhelpermod/core/**'
+        }
+    }
 }

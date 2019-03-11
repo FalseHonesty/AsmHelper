@@ -101,5 +101,7 @@ enum class JumpCondition(val opcode: Int) {
     LESS_OR_EQUAL(Opcodes.IFLE),
     NULL(Opcodes.IFNULL),
     NON_NULL(Opcodes.IFNONNULL),
-    GOTO(Opcodes.GOTO)
+    GOTO(Opcodes.GOTO),
+    REFS_EQUAL(Opcodes.IF_ACMPEQ),
+    REFS_NOT_EQUAL(Opcodes.IF_ACMPNE)
 }
