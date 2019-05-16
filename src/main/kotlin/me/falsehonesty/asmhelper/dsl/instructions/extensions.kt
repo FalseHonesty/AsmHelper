@@ -53,12 +53,17 @@ fun InsnListBuilder.float(number: Float) {
 /**
  * Helper for creating an if clause.
  *
- * Jumps into the provided code if and only if the provided condition is TRUE.
+ * Jumps into the provided code if and only if the provided condition(s) is/are TRUE.
+ *
+ * If you have multiple conditions, they will be called in the order they are passed. Because of that,
+ * you must set up the stack accordingly.
  */
-inline fun InsnListBuilder.ifClause(condition: JumpCondition, code: InsnListBuilder.() -> Unit) {
+inline fun InsnListBuilder.ifClause(vararg conditions: JumpCondition, code: InsnListBuilder.() -> Unit) {
     val label = makeLabel()
 
-    jump(condition, label)
+    for (condition in conditions) {
+        jump(condition, label)
+    }
 
     this.code()
 

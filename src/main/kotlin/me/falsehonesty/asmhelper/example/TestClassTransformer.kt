@@ -58,7 +58,9 @@ class TestClassTransformer : BaseClassTransformer() {
             aload(0)
             instanceof("net/minecraft/entity/EntityLivingBase")
 
-            ifClause(JumpCondition.NOT_EQUAL) {
+            field(FieldAction.GET_STATIC, "xxx", "xxx", "xxx")
+
+            ifClause(JumpCondition.NOT_EQUAL, JumpCondition.NOT_EQUAL) {
                 aload(0)
                 fload(1)
                 invoke(InvokeType.SPECIAL, "net/minecraft/entity/Entity", "getLook", "(F)Lnet/minecraft/util/Vec3;")

@@ -4,8 +4,9 @@ public class test {
 
     public void test() {
         D f = getD();
+        D z = getD();
 
-        if (f == D.X) {
+        if (f == D.X && z == D.X) {
             System.out.println("x");
         }
     }
