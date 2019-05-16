@@ -14,6 +14,14 @@ enum class InvokeType(val opcode: Int) {
 
 fun InsnListBuilder.invoke(type: InvokeType, descriptor: Descriptor) = this.invoke(type, descriptor.owner, descriptor.name, descriptor.desc)
 
+
+/**
+ * Calls a specified method.
+ *
+ * @param owner the name of the owning class. Packages should be separated using slashes.
+ * @param name the name of the method to call.
+ * @param desc the method's signature. Ex. (F)Lnet/minecraft/util/Vec3;
+ */
 fun InsnListBuilder.invoke(type: InvokeType, owner: String, name: String, desc: String) {
     val realName =
         if (!AsmHelper.obfuscated) FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(owner, name, desc) else name

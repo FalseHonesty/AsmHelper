@@ -139,6 +139,8 @@ class InsnListBuilder : Opcodes {
         insn(InsnNode(ISUB))
     }
 
+    fun instanceof(clazzName: String) = insn(TypeInsnNode(INSTANCEOF, clazzName))
+
     fun new(className: String) {
         insn(TypeInsnNode(NEW, className))
     }
@@ -155,8 +157,15 @@ class InsnListBuilder : Opcodes {
         insn(InsnNode(RETURN))
     }
 
+    /**
+     * Creates a new label, but does not place it anywhere in the bytecode,
+     * it simply gives you a reference to it.
+     */
     fun makeLabel() = LabelNode()
 
+    /**
+     * Places a previously created label.
+     */
     fun placeLabel(label: LabelNode) {
         insn(label)
     }
@@ -177,6 +186,11 @@ class InsnListBuilder : Opcodes {
 }
 
 enum class JumpCondition(val opcode: Int) {
+    /**
+     * Wrapper for IFEQ.
+     *
+     * Checks if equal to 0.
+     */
     EQUAL(IFEQ),
     NOT_EQUAL(IFNE),
     LESS_THAN(IFLT),

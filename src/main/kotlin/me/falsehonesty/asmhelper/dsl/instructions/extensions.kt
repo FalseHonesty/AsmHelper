@@ -50,16 +50,26 @@ fun InsnListBuilder.float(number: Float) {
     }
 }
 
-inline fun InsnListBuilder.ifClause(cond: JumpCondition, code: InsnListBuilder.() -> Unit) {
+/**
+ * Helper for creating an if clause.
+ *
+ * Jumps into the provided code if and only if the provided condition is TRUE.
+ */
+inline fun InsnListBuilder.ifClause(condition: JumpCondition, code: InsnListBuilder.() -> Unit) {
     val label = makeLabel()
 
-    jump(cond, label)
+    jump(condition, label)
 
     this.code()
 
     placeLabel(label)
 }
 
+/**
+ * A helper function to create a new instance of a class.
+ *
+ * This is simply a helper wrapper around the sequence of calls necessary to create a new object (new, dup, invokespecial)
+ */
 inline fun InsnListBuilder.createInstance(className: String, constructorDescription: String, parameters: InsnListBuilder.() -> Unit = {}) {
     new(className)
     dup()

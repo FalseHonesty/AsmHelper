@@ -48,4 +48,22 @@ class TestClassTransformer : BaseClassTransformer() {
         fieldDesc = "I"
         initialValue = 0
     }
+
+    private fun injectSuper() = inject {
+        className = "net.minecraft.entity.EntityLivingBase"
+        methodName = "getLook"
+        at = At(InjectionPoint.HEAD)
+
+        insnList {
+            aload(0)
+            instanceof("net/minecraft/entity/EntityLivingBase")
+
+            ifClause(JumpCondition.NOT_EQUAL) {
+                aload(0)
+                fload(1)
+                invoke(InvokeType.SPECIAL, "net/minecraft/entity/Entity", "getLook", "(F)Lnet/minecraft/util/Vec3;")
+                areturn()
+            }
+        }
+    }
 }
