@@ -20,6 +20,11 @@ fun inject(config: InjectWriter.Builder.() -> Unit) {
     AsmHelper.asmWriters.add(writer.build())
 }
 
+/**
+ * Removes all existing instructions and replaces them with the specified bytecode.
+ *
+ * This IS a destructive action.
+ */
 fun overwrite(config: OverwriteWriter.Builder.() -> Unit) {
     val writer = OverwriteWriter.Builder()
 
@@ -28,6 +33,11 @@ fun overwrite(config: OverwriteWriter.Builder.() -> Unit) {
     AsmHelper.asmWriters.add(writer.build())
 }
 
+/**
+ * Adds the specified field into the transformed class.
+ *
+ * This instruction will not harm any existing code.
+ */
 fun applyField(config: FieldWriter.Builder.() -> Unit) {
     val writer = FieldWriter.Builder()
 
@@ -36,6 +46,11 @@ fun applyField(config: FieldWriter.Builder.() -> Unit) {
     AsmHelper.asmWriters.add(writer.build())
 }
 
+/**
+ * Removes a specified number of instructions in a method.
+ *
+ * This IS a destructive operation (obviously).
+ */
 fun remove(config: RemoveWriter.Builder.() -> Unit) {
     val writer = RemoveWriter.Builder()
 

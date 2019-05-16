@@ -1,4 +1,7 @@
 public class test {
+    D[] nums = new D[]{ };
+    double e = 0.5;
+
     public void test() {
         D f = getD();
 

@@ -40,3 +40,8 @@ fun InsnListBuilder.updateLocalField(descriptor: Descriptor, updater: InsnListBu
 
     field(FieldAction.PUT_FIELD, descriptor)
 }
+
+fun InsnListBuilder.setLocalField(descriptor: Descriptor) {
+    aload(0)
+    field(FieldAction.PUT_FIELD, descriptor)
+}

@@ -7,8 +7,6 @@ import java.util.Map;
 public class AsmHelperLoadingPlugin implements IFMLLoadingPlugin {
     @Override
     public String[] getASMTransformerClass() {
-        System.out.println("Getting ASM Transformers");
-
         return new String[] {
             "me.falsehonesty.asmhelper.example.TestClassTransformer"
         };

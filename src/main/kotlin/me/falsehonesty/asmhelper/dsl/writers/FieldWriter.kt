@@ -12,8 +12,7 @@ class FieldWriter(
     private val fieldDesc: String,
     private val initialValue: Any?,
     private val initializer: InsnList?,
-    private val initializerDesc: String?,
-    private vararg val accessTypes: AccessType
+    private val accessTypes: List<AccessType>
 ) : AsmWriter(className) {
     override fun transform(classNode: ClassNode) {
         classNode.fields.add(FieldNode(
@@ -24,9 +23,9 @@ class FieldWriter(
             initialValue
         ))
 
-        if (initializer != null && initializerDesc != null) {
+        if (initializer != null) {
             val insns = classNode.methods
-                .find { it.name == "<init>" && it.desc == initializerDesc }
+                .find { it.name == "<init>" }
                 ?.instructions ?: return
 
             insns.insertBefore(insns.last.previous, initializer)
@@ -43,7 +42,6 @@ class FieldWriter(
         var fieldName: String? = null
         var fieldDesc: String? = null
         var initialValue: Any? = null
-        var initializerDescriptor: String? = null
         var initializer: InsnList? = null
 
         @Throws(IllegalStateException::class)
@@ -54,8 +52,7 @@ class FieldWriter(
                 fieldDesc ?: throw IllegalStateException("fieldDesc must not be null"),
                 initialValue,
                 initializer,
-                initializerDescriptor,
-                *accessTypes.toTypedArray()
+                accessTypes
             )
         }
 
