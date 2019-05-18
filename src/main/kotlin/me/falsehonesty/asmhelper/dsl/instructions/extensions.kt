@@ -89,7 +89,7 @@ inline fun InsnListBuilder.createInstance(className: String, constructorDescript
     )
 }
 
-inline fun InsnListBuilder.ifElseClause(cond: JumpCondition, builder: IfElseBuilder.() -> Unit) {
+inline fun InsnListBuilder.ifElseClause(vararg conditions: JumpCondition, builder: IfElseBuilder.() -> Unit) {
     val ifElse = IfElseBuilder()
 
     ifElse.builder()
@@ -97,7 +97,9 @@ inline fun InsnListBuilder.ifElseClause(cond: JumpCondition, builder: IfElseBuil
     val ifLabel = makeLabel()
     val endLabel = makeLabel()
 
-    jump(cond, ifLabel)
+    for (cond in conditions) {
+        jump(cond, ifLabel)
+    }
 
     insertInsns(ifElse.elseCode)
 
