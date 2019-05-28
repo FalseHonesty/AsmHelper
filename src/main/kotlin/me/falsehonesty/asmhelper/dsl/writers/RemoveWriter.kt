@@ -10,10 +10,12 @@ class RemoveWriter(
     className: String,
     private val methodName: String,
     private val at: At,
-    private val numberToRemove: Int
+    private val numberToRemove: Int,
+    private val methodDesc: String? = null
 ) : AsmWriter(className) {
     override fun transform(classNode: ClassNode) {
         classNode.methods
+            .filter { if (methodDesc != null) it.desc == methodDesc else true }
             .find { FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(classNode.name, it.name, it.desc) == methodName }
             ?.let { removeInsns(it) }
     }
