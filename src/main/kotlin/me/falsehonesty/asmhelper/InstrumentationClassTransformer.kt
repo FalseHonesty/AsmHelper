@@ -33,24 +33,24 @@ abstract class InstrumentationClassTransformer : ClassFileTransformer {
             calledSetup = true
         }
 
-        AsmHelper.classReplacers[transformedName]?.let { classFile ->
-            logger.info("Completely replacing {} with data from {}.", transformedName, classFile)
+        AsmHelper.classReplacers[className]?.let { classFile ->
+            logger.info("Completely replacing {} with data from {}.", className, classFile)
 
             return loadClassResource(classFile)
         }
 
         val writers = AsmHelper.asmWriters
-            .filter { it.className == transformedName }
+            .filter { it.className == className }
             .ifEmpty { return basicClass }
 
-        logger.info("Transforming class {}", transformedName)
+        logger.info("Transforming class {}", className)
 
         val classReader = ClassReader(basicClass)
         val classNode = ClassNode()
         classReader.accept(classNode, ClassReader.EXPAND_FRAMES)
 
         writers.forEach {
-            logger.info("Applying AsmWriter {} to class {}", it, transformedName)
+            logger.info("Applying AsmWriter {} to class {}", it, className)
 
             it.transform(classNode)
         }
@@ -59,7 +59,7 @@ abstract class InstrumentationClassTransformer : ClassFileTransformer {
         try {
             classNode.accept(classWriter)
         } catch (e: Throwable) {
-            logger.error("Exception when transforming {} : {}", transformedName, e.javaClass.simpleName)
+            logger.error("Exception when transforming {} : {}", className, e.javaClass.simpleName)
             e.printStackTrace()
         }
 
