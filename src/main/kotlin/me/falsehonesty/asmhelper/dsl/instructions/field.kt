@@ -16,7 +16,7 @@ fun InsnListBuilder.field(action: FieldAction, descriptor: Descriptor) = this.fi
 
 fun InsnListBuilder.field(action: FieldAction, owner: String, name: String, desc: String) {
     //TODO: Create our own utility so we can go from deobf -> obf
-    val realName = if (!AsmHelper.obfuscated) FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(owner, name, desc)
+    val realName = if (!AsmHelper.deobf) FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(owner, name, desc)
     else name
 
     insnList.add(FieldInsnNode(

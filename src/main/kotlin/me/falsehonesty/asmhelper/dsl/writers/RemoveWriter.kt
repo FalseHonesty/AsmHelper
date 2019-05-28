@@ -1,5 +1,6 @@
 package me.falsehonesty.asmhelper.dsl.writers
 
+import me.falsehonesty.asmhelper.AsmHelper
 import me.falsehonesty.asmhelper.dsl.AsmWriter
 import me.falsehonesty.asmhelper.dsl.At
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper
@@ -16,7 +17,13 @@ class RemoveWriter(
     override fun transform(classNode: ClassNode) {
         classNode.methods
             .filter { if (methodDesc != null) it.desc == methodDesc else true }
-            .find { FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(classNode.name, it.name, it.desc) == methodName }
+            .find {
+                if (!AsmHelper.deobf) {
+                    FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(classNode.name, it.name, it.desc) == methodName
+                } else {
+                    it.name == methodName
+                }
+            }
             ?.let { removeInsns(it) }
     }
 

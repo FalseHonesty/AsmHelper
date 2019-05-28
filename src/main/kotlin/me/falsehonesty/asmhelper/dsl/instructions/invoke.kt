@@ -24,7 +24,7 @@ fun InsnListBuilder.invoke(type: InvokeType, descriptor: Descriptor) = this.invo
  */
 fun InsnListBuilder.invoke(type: InvokeType, owner: String, name: String, desc: String) {
     val realName =
-        if (!AsmHelper.obfuscated) FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(owner, name, desc) else name
+        if (!AsmHelper.deobf) FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(owner, name, desc) else name
 
     insnList.add(MethodInsnNode(
         type.opcode,

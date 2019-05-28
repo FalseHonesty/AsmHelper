@@ -1,5 +1,6 @@
 package me.falsehonesty.asmhelper
 
+import me.falsehonesty.asmhelper.dsl.AsmWriter
 import org.apache.logging.log4j.LogManager
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
