@@ -58,7 +58,7 @@ processResources {
 }
 jar {
     manifest {
-        attributes "ModSide": "CLIENT"//, "FMLCorePlugin": "me.falsehonesty.asmhelpermod.core.AsmHelperLoadingPlugin"
+        attributes "ModSide": "CLIENT"
     }
 }
 configurations {
@@ -70,7 +70,7 @@ sourceSets {
     main {
         kotlin {
             exclude 'me/falsehonesty/asmhelper/example/**'
-            exclude 'me/falsehonesty/asmhelpermod/core/**'
+            exclude 'me/falsehonesty/asmhelpermod/**'
         }
     }
 }
