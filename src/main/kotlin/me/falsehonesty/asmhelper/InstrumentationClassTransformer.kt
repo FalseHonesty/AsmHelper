@@ -1,6 +1,5 @@
 package me.falsehonesty.asmhelper
 
-import me.falsehonesty.asmhelper.dsl.AsmWriter
 import org.apache.logging.log4j.LogManager
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
@@ -22,8 +21,12 @@ abstract class InstrumentationClassTransformer : ClassFileTransformer {
      */
     abstract fun makeTransformers()
 
-    override fun transform(classLoader: ClassLoader?, transformedName: String?, p2: Class<*>?, p3: ProtectionDomain?, basicClass: ByteArray?): ByteArray? {
-        if (basicClass == null) return null
+    override fun transform(classLoader: ClassLoader?, className: String?, p2: Class<*>?, p3: ProtectionDomain?, basicClass: ByteArray?): ByteArray? {
+        if (basicClass == null || className == null) return null
+
+        if (className.startsWith("kotlin.") || className.startsWith("me.falsehonesty.asmhelper.") || className.startsWith(this.javaClass.name)) {
+            return basicClass
+        }
 
         if (!calledSetup) {
             setup()
