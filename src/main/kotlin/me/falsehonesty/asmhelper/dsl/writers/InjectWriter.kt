@@ -13,19 +13,14 @@ import org.objectweb.asm.tree.MethodNode
 class InjectWriter(
     className: String,
     private val methodName: String,
+    private val methodDesc: String,
     private val at: At,
-    private val insnList: InsnList,
-    private val methodDesc: String? = null
+    private val insnList: InsnList
 ) : AsmWriter(className) {
     override fun transform(classNode: ClassNode) {
         classNode.methods
-            .filter { if (methodDesc != null) it.desc == methodDesc else true }
             .find {
-                if (!AsmHelper.deobf) {
-                    FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(classNode.name, it.name, it.desc) == methodName
-                } else {
-                    it.name == methodName
-                }
+                it.desc == methodDesc && AsmHelper.remapper.remapMethodName(classNode.name, methodName, methodDesc) == it.name
             }
             ?.let { injectInsnList(it) }
     }
@@ -57,12 +52,13 @@ class InjectWriter(
     }
 
     override fun toString(): String {
-        return "AsmWriter{className=$className, methodName=$methodName, at=$at}"
+        return "AsmWriter{className=$className, methodName=$methodName, methodDesc=$methodDesc, at=$at}"
     }
 
     class Builder {
         var className: String? = null
         var methodName: String? = null
+        var methodDesc: String? = null
         var at: At? = null
         var insnListData: InsnList? = null
 
@@ -71,6 +67,7 @@ class InjectWriter(
             return InjectWriter(
                 className ?: throw IllegalStateException("className must NOT be null."),
                 methodName ?: throw IllegalStateException("methodName must NOT be null."),
+                methodDesc ?: throw IllegalStateException("methodDesc must NOT be null."),
                 at ?: throw IllegalStateException("at must NOT be null."),
                 insnListData ?: throw IllegalStateException("insnListData must NOT be null.")
             )

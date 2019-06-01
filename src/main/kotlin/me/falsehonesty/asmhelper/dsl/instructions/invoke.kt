@@ -23,8 +23,7 @@ fun InsnListBuilder.invoke(type: InvokeType, descriptor: Descriptor) = this.invo
  * @param desc the method's signature. Ex. (F)Lnet/minecraft/util/Vec3;
  */
 fun InsnListBuilder.invoke(type: InvokeType, owner: String, name: String, desc: String) {
-    val realName =
-        if (!AsmHelper.deobf) FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(owner, name, desc) else name
+    val realName = AsmHelper.remapper.remapMethodName(owner, name, desc)
 
     insnList.add(MethodInsnNode(
         type.opcode,

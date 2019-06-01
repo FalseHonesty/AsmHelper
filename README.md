@@ -102,8 +102,9 @@ class TestClassTransformer : BaseClassTransformer() {
 ```
 
 Next, the `inject` block needs work. When injecting, you need to pick a method to
-inject into, so we need to specify that. In addition, we need to the library
-where we want to inject, so we can use the handy `At` class as a utility.
+inject into, so we need to specify that, as well as its description.
+In addition, we need to the library where we want to inject, so we can
+use the handy `At` class as a utility.
 
 ```kotlin
 class TestClassTransformer : BaseClassTransformer() {
@@ -115,6 +116,7 @@ class TestClassTransformer : BaseClassTransformer() {
     private fun injectCountPrint() = inject {
         className = "net.minecraft.client.gui.GuiNewChat"
         methodName = "printChatMessage"
+        methodDesc = "(Lnet/minecraft/util/IChatComponent;)V"
         at = At(InjectionPoint.HEAD)
     }
 
@@ -148,6 +150,7 @@ class TestClassTransformer : BaseClassTransformer() {
     private fun injectCountPrint() = inject {
         className = "net.minecraft.client.gui.GuiNewChat"
         methodName = "printChatMessage"
+        methodDesc = "(Lnet/minecraft/util/IChatComponent;)V"
         at = At(InjectionPoint.HEAD)
 
         insnList {
@@ -181,3 +184,40 @@ class TestClassTransformer : BaseClassTransformer() {
     }
 }
 ```
+
+# Remapping
+
+One of the big issues when editing Minecraft bytecode is dealing with
+obfuscated names. Thus, this library aims to provide an easy way to deal with
+obfuscation: not having to!
+
+However, this library also aims to be used in many different minecraft environments,
+so you need to pick the correct Remapper for your use case. In most cases, the library
+will do this for you, however, there is some setup that needs to be done in some cases.
+
+### Targeting Notch (Non-Forge)
+
+If you are targeting a non-Forge environment, there are some simple things you
+need to do.
+
+1. Add `-Dasmhelper.deobf=true` to your VM Arguments in your development environment
+run configuration. This allows the library to know when to remap and when not to.
+
+2. Since we don't have Forge's utilities, we need to do some manual labor.
+Go to your `~/.gradle/caches/minecraft/de/oceanlabs/mcp` directory because we need to grab the
+mappings. From here there will be a folder beginning with `mcp_`. The ending of
+the file name varies depending on the mappings you use, so dont worry about it
+too much. Inside that folder, pick the folder with the name that is equal to the
+mappings value in your `build.gradle` (ex. 22 for `mappings = "stable_22"`). Inside
+that folder, grab the `srgs/mcp-notch.srg` file and put it in your `src/main/resources`
+dir. It is up to the project developer whether or not this file should be added to
+the .gitignore. However, if the jar will be built on a CI server, the file needs to
+exist!
+
+And that should be it! Now, when you build your project, the mappings should be
+included for the AsmHelper library to locate and use.
+
+Note: This is a large file. In the future it is likely I will add a utility
+that will trim this file down automatically by scanning each project's code, but
+for now, since this environment is primarily used for creating clients, it isn't
+a priority.

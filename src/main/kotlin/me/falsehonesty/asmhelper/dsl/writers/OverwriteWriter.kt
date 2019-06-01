@@ -10,18 +10,13 @@ import org.objectweb.asm.tree.MethodNode
 class OverwriteWriter(
     className: String,
     private val methodName: String,
-    private val insnList: InsnList,
-    private val methodDesc: String? = null
+    private val methodDesc: String,
+    private val insnList: InsnList
 ) : AsmWriter(className) {
     override fun transform(classNode: ClassNode) {
         classNode.methods
-            .filter { if (methodDesc != null) it.desc == methodDesc else true }
             .find {
-                if (!AsmHelper.deobf) {
-                    FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(classNode.name, it.name, it.desc) == methodName
-                } else {
-                    it.name == methodName
-                }
+                it.desc == methodDesc && AsmHelper.remapper.remapMethodName(classNode.name, methodName, methodDesc) == it.name
             }
             ?.let { overwriteMethod(it) }
     }
@@ -37,6 +32,7 @@ class OverwriteWriter(
     class Builder {
         var className: String? = null
         var methodName: String? = null
+        var methodDesc: String? = null
         var insnListData: InsnList? = null
 
         @Throws(IllegalStateException::class)
@@ -44,6 +40,7 @@ class OverwriteWriter(
             return OverwriteWriter(
                 className ?: throw IllegalStateException("className must NOT be null."),
                 methodName ?: throw IllegalStateException("methodName must NOT be null."),
+                methodDesc ?: throw IllegalStateException("methodDesc must NOT be null."),
                 insnListData ?: throw IllegalStateException("insnListData must NOT be null.")
             )
         }

@@ -17,6 +17,7 @@ class TestClassTransformer : BaseClassTransformer() {
     private fun injectCountPrint() = inject {
         className = "net.minecraft.client.gui.GuiNewChat"
         methodName = "printChatMessage"
+        methodDesc = "(Lnet/minecraft/util/IChatComponent;)V"
         at = At(InjectionPoint.HEAD)
 
         insnList {
@@ -52,6 +53,7 @@ class TestClassTransformer : BaseClassTransformer() {
     private fun injectSuper() = inject {
         className = "net.minecraft.entity.EntityLivingBase"
         methodName = "getLook"
+        methodDesc = "(F)Lnet/minecraft/util/Vec3;"
         at = At(InjectionPoint.HEAD)
 
         insnList {

@@ -9,6 +9,7 @@ fun test() {
     inject {
         className = "net.minecraft.client.gui.inventory.GuiContainer"
         methodName = "mouseClicked"
+        methodDesc = "(III)V"
         at = At(InjectionPoint.TAIL)
 
         insnList {
