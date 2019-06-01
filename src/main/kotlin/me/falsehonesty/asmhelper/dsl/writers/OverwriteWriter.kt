@@ -2,6 +2,7 @@ package me.falsehonesty.asmhelper.dsl.writers
 
 import me.falsehonesty.asmhelper.AsmHelper
 import me.falsehonesty.asmhelper.dsl.AsmWriter
+import me.falsehonesty.asmhelper.dsl.instructions.InsnListBuilder
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.InsnList
@@ -43,6 +44,13 @@ class OverwriteWriter(
                 methodDesc ?: throw IllegalStateException("methodDesc must NOT be null."),
                 insnListData ?: throw IllegalStateException("insnListData must NOT be null.")
             )
+        }
+
+        fun insnList(config: InsnListBuilder.() -> Unit) {
+            val builder = InsnListBuilder()
+            builder.config()
+
+            this.insnListData = builder.build()
         }
     }
 }

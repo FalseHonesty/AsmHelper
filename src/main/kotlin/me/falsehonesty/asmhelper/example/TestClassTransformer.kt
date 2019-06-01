@@ -12,6 +12,8 @@ class TestClassTransformer : BaseClassTransformer() {
     override fun makeTransformers() {
         injectCountField()
         injectCountPrint()
+
+        world()
     }
 
     private fun injectCountPrint() = inject {

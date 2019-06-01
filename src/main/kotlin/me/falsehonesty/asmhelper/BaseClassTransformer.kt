@@ -18,8 +18,12 @@ abstract class BaseClassTransformer : IClassTransformer {
         classLoader.addTransformerExclusion("me.falsehonesty.asmhelper.")
         classLoader.addTransformerExclusion(this.javaClass.name)
 
+        setup(classLoader)
+
         makeTransformers()
     }
+
+    protected fun setup(classLoader: LaunchClassLoader) {}
 
     /**
      * This is where you would place all of your asm helper dsl magic

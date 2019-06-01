@@ -45,6 +45,6 @@ fun InsnListBuilder.invoke(type: InvokeType, owner: String, name: String, desc: 
  *
  * Definitely not necessary, it simply runs the code in the lambda immediately.
  */
-fun InsnListBuilder.argument(argumentCode: InsnListBuilder.() -> Unit) {
+inline fun InsnListBuilder.argument(argumentCode: InsnListBuilder.() -> Unit) {
     this.argumentCode()
 }
