@@ -39,3 +39,12 @@ fun InsnListBuilder.invoke(type: InvokeType, owner: String, name: String, desc: 
         type == InvokeType.INTERFACE
     ))
 }
+
+/**
+ * Simple block to segment off each individual argument.
+ *
+ * Definitely not necessary, it simply runs the code in the lambda immediately.
+ */
+fun InsnListBuilder.argument(argumentCode: InsnListBuilder.() -> Unit) {
+    this.argumentCode()
+}
