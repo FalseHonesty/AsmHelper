@@ -77,5 +77,10 @@ sourceSets {
 
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
-    from sourceSets.main.kotlin.srcDirs
+    from sourceSets.main.kotlin
+}
+
+
+artifacts {
+    archives sourcesJar
 }
