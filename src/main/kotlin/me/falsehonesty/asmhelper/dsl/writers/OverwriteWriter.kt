@@ -23,7 +23,8 @@ class OverwriteWriter(
     }
 
     private fun overwriteMethod(node: MethodNode) {
-        node.instructions = insnList
+        node.instructions.clear()
+        node.instructions.add(insnList)
     }
 
     override fun toString(): String {

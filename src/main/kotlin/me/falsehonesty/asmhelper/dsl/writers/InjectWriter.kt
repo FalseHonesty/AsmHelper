@@ -52,7 +52,7 @@ class InjectWriter(
     }
 
     override fun toString(): String {
-        return "AsmWriter{className=$className, methodName=$methodName, methodDesc=$methodDesc, at=$at}"
+        return "InjectWriter{className=$className, methodName=$methodName, methodDesc=$methodDesc, at=$at}"
     }
 
     class Builder {

@@ -1,10 +1,7 @@
 package me.falsehonesty.asmhelper.example
 
 import me.falsehonesty.asmhelper.BaseClassTransformer
-import me.falsehonesty.asmhelper.dsl.At
-import me.falsehonesty.asmhelper.dsl.InjectionPoint
-import me.falsehonesty.asmhelper.dsl.applyField
-import me.falsehonesty.asmhelper.dsl.inject
+import me.falsehonesty.asmhelper.dsl.*
 import me.falsehonesty.asmhelper.dsl.instructions.*
 import me.falsehonesty.asmhelper.dsl.writers.AccessType
 
@@ -16,11 +13,11 @@ class TestClassTransformer : BaseClassTransformer() {
         world()
     }
 
-    private fun injectCountPrint() = inject {
+    private fun injectCountPrint() = overwrite {
         className = "net.minecraft.client.gui.GuiNewChat"
         methodName = "printChatMessage"
         methodDesc = "(Lnet/minecraft/util/IChatComponent;)V"
-        at = At(InjectionPoint.HEAD)
+//        at = At(InjectionPoint.HEAD)
 
         insnList {
             field(FieldAction.GET_STATIC, "java/lang/System", "out", "Ljava/io/PrintStream;")
@@ -44,6 +41,8 @@ class TestClassTransformer : BaseClassTransformer() {
                 bipush(1)
                 iadd()
             }
+
+            methodReturn()
         }
     }
 
