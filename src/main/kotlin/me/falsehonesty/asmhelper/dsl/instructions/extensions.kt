@@ -8,7 +8,7 @@ import org.objectweb.asm.tree.InsnNode
  * Gets an instance of a Kotlin Object.
  */
 fun InsnListBuilder.getKObjectInstance(objectClassName: String) {
-    field(FieldAction.GET_STATIC, objectClassName, "INSTANCE", "L$objectClassName")
+    field(FieldAction.GET_STATIC, objectClassName, "INSTANCE", "L$objectClassName;")
 }
 
 /**
