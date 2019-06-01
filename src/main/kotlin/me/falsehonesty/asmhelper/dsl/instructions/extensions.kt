@@ -5,6 +5,25 @@ import org.objectweb.asm.tree.InsnList
 import org.objectweb.asm.tree.InsnNode
 
 /**
+ * Gets an instance of a Kotlin Object.
+ */
+fun InsnListBuilder.getKObjectInstance(objectClassName: String) {
+    field(FieldAction.GET_STATIC, objectClassName, "INSTANCE", "L$objectClassName")
+}
+
+/**
+ * Calls an instance method on a Kotlin Object.
+ *
+ * Behind the scenes, this produces bytecode that gets the Object instance, and
+ * then calls the method.
+ */
+fun InsnListBuilder.invokeKOBjectFunction(objectClassName: String, methodName: String, methodDesc: String) {
+    getKObjectInstance(objectClassName)
+
+    invoke(InvokeType.VIRTUAL, objectClassName, methodName, methodDesc)
+}
+
+/**
  * An abstraction over iconst, bipush, sipush, and ldc, picking the best one
  * available.
  */
