@@ -23,7 +23,7 @@ abstract class BaseClassTransformer : IClassTransformer {
         makeTransformers()
     }
 
-    protected fun setup(classLoader: LaunchClassLoader) {}
+    protected open fun setup(classLoader: LaunchClassLoader) {}
 
     /**
      * This is where you would place all of your asm helper dsl magic
