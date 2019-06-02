@@ -46,7 +46,7 @@ abstract class BaseClassTransformer : IClassTransformer {
         }
 
         val writers = AsmHelper.asmWriters
-            .filter { it.className == transformedName }
+            .filter { it.className.replace('/', '.') == transformedName }
             .ifEmpty { return basicClass }
 
         logger.info("Transforming class {}", transformedName)
