@@ -17,10 +17,10 @@ fun InsnListBuilder.getKObjectInstance(objectClassName: String) {
  * Behind the scenes, this produces bytecode that gets the Object instance, and
  * then calls the method.
  */
-fun InsnListBuilder.invokeKOBjectFunction(objectClassName: String, methodName: String, methodDesc: String) {
+fun InsnListBuilder.invokeKOBjectFunction(objectClassName: String, methodName: String, methodDesc: String, arguments: (InsnListBuilder.() -> Unit)? = null) {
     getKObjectInstance(objectClassName)
 
-    invoke(InvokeType.VIRTUAL, objectClassName, methodName, methodDesc)
+    invoke(InvokeType.VIRTUAL, objectClassName, methodName, methodDesc, arguments)
 }
 
 /**
