@@ -53,7 +53,7 @@ abstract class BaseClassTransformer : IClassTransformer {
 
         val classReader = ClassReader(basicClass)
         val classNode = ClassNode()
-        classReader.accept(classNode, ClassReader.EXPAND_FRAMES)
+        classReader.accept(classNode, ClassReader.SKIP_FRAMES)
 
         writers.forEach {
             logger.info("Applying AsmWriter {} to class {}", it, transformedName)
