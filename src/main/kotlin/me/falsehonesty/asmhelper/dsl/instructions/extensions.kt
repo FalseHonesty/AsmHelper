@@ -73,6 +73,9 @@ fun InsnListBuilder.float(number: Float) {
  * Helper for creating an if clause.
  *
  * Jumps into the provided code if and only if the provided condition(s) is/are TRUE.
+ * NOTE: This works somewhat inversely to a normal if statement. The code inside the if
+ * will be SKIPPED if at least ONE of your jump conditions is true. While this may seem counterintuitive,
+ * it better lines up with how JVM Bytecode actually works.
  *
  * If you have multiple conditions, they will be called in the order they are passed. Because of that,
  * you must set up the stack accordingly.
@@ -150,4 +153,9 @@ class IfElseBuilder {
 
         elseCode = insn.build()
     }
+}
+
+enum class BooleanLogic {
+    AND,
+    OR
 }

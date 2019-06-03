@@ -187,10 +187,13 @@ class InsnListBuilder : Opcodes {
 
 enum class JumpCondition(val opcode: Int) {
     /**
-     * Wrapper for IFEQ.
-     *
-     * Checks if equal to 0.
+     * Equivalent to IFNE and [NOT_EQUAL]
      */
+    TRUE(IFNE),
+    /**
+     * Equivalent to IFEQ and [EQUAL]
+     */
+    FALSE(IFEQ),
     EQUAL(IFEQ),
     NOT_EQUAL(IFNE),
     LESS_THAN(IFLT),
