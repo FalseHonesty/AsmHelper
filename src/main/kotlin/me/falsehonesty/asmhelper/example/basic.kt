@@ -25,8 +25,10 @@ fun test() {
                 "checkHotbarKeys",
                 "(I)Z"
             )
+            val hotbarKeyPressed = istore()
 
-            ifClause(JumpCondition.NOT_EQUAL) {
+            load(hotbarKeyPressed)
+            ifClause(JumpCondition.TRUE) {
                 methodReturn()
             }
 

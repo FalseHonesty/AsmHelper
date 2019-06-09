@@ -4,8 +4,9 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.tree.*
 
-class InsnListBuilder : Opcodes {
+class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
     val insnList = InsnList()
+    var currentLocalIndex = toInjectInto.maxLocals
 
     fun aconst_null() {
         insn(InsnNode(ACONST_NULL))
@@ -123,6 +124,10 @@ class InsnListBuilder : Opcodes {
         insn(VarInsnNode(ILOAD, value))
     }
 
+    fun istore(value: Int) {
+        insn(VarInsnNode(ISTORE, value))
+    }
+
     fun iadd() {
         insn(InsnNode(IADD))
     }
@@ -137,6 +142,14 @@ class InsnListBuilder : Opcodes {
 
     fun isub() {
         insn(InsnNode(ISUB))
+    }
+
+    fun lstore(value: Int) {
+        insn(VarInsnNode(LSTORE, value))
+    }
+
+    fun lload(value: Int) {
+        insn(VarInsnNode(LLOAD, value))
     }
 
     fun instanceof(clazzName: String) = insn(TypeInsnNode(INSTANCEOF, clazzName))

@@ -3,6 +3,7 @@ package me.falsehonesty.asmhelper.dsl.instructions
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.InsnList
 import org.objectweb.asm.tree.InsnNode
+import org.objectweb.asm.tree.MethodNode
 
 /**
  * Gets an instance of a Kotlin Object.
@@ -112,7 +113,7 @@ inline fun InsnListBuilder.createInstance(className: String, constructorDescript
 }
 
 inline fun InsnListBuilder.ifElseClause(vararg conditions: JumpCondition, builder: IfElseBuilder.() -> Unit) {
-    val ifElse = IfElseBuilder()
+    val ifElse = IfElseBuilder(toInjectInto)
 
     ifElse.builder()
 
@@ -134,12 +135,12 @@ inline fun InsnListBuilder.ifElseClause(vararg conditions: JumpCondition, builde
     placeLabel(endLabel)
 }
 
-class IfElseBuilder {
+class IfElseBuilder(val methodNode: MethodNode) {
     var ifCode = InsnList()
     var elseCode = InsnList()
 
     fun ifCode(builder: InsnListBuilder.() -> Unit) {
-        val insn = InsnListBuilder()
+        val insn = InsnListBuilder(methodNode)
 
         insn.builder()
 
@@ -147,7 +148,7 @@ class IfElseBuilder {
     }
 
     fun elseCode(builder: InsnListBuilder.() -> Unit) {
-        val insn = InsnListBuilder()
+        val insn = InsnListBuilder(methodNode)
 
         insn.builder()
 

@@ -26,7 +26,7 @@ fun InsnListBuilder.invoke(type: InvokeType, owner: String, name: String, desc: 
     val realName = AsmHelper.remapper.remapMethodName(owner, name, desc)
 
     if (arguments != null) {
-        val insns = InsnListBuilder()
+        val insns = InsnListBuilder(toInjectInto)
         insns.arguments()
         insnList.add(insns.build())
     }
