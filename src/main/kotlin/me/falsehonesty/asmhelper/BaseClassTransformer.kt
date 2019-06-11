@@ -23,6 +23,14 @@ abstract class BaseClassTransformer : IClassTransformer {
         makeTransformers()
     }
 
+    /**
+     * Enables debug class loading. This means all transformed classes will be printed.
+     */
+    protected fun debugClassLoading() {
+        System.setProperty("legacy.debugClassLoading", "true")
+        System.setProperty("legacy.debugClassLoadingSave", "true")
+    }
+
     protected open fun setup(classLoader: LaunchClassLoader) {}
 
     /**

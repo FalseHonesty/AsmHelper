@@ -9,6 +9,7 @@ class TestClassTransformer : BaseClassTransformer() {
     override fun makeTransformers() {
         injectCountField()
         injectCountPrint()
+        injectDrawSplashScreen()
 
         world()
     }
@@ -72,6 +73,24 @@ class TestClassTransformer : BaseClassTransformer() {
                 invoke(InvokeType.SPECIAL, "net/minecraft/entity/Entity", "getLook", "(F)Lnet/minecraft/util/Vec3;")
                 areturn()
             }
+        }
+    }
+
+    private fun injectDrawSplashScreen() = overwrite {
+        className = "net.minecraft.client.Minecraft"
+        methodName = "drawSplashScreen"
+        methodDesc = "(Lnet/minecraft/client/renderer/texture/TextureManager;)V"
+
+        insnList {
+            placeLabel(makeLabel())
+
+            invokeKOBjectFunction(
+                "me/falsehonesty/asmhelper/example/TestHelper",
+                "drawSplash",
+                "()V"
+            )
+
+            methodReturn()
         }
     }
 }

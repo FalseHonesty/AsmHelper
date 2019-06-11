@@ -26,6 +26,8 @@ class OverwriteWriter(
 
     private fun overwriteMethod(node: MethodNode) {
         node.instructions.clear()
+        node.exceptions.clear()
+        node.tryCatchBlocks.clear()
 
         val builder = InsnListBuilder(node)
         builder.insnList()
