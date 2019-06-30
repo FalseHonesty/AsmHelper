@@ -15,9 +15,7 @@ enum class FieldAction(val opcode: Int) {
 fun InsnListBuilder.field(action: FieldAction, descriptor: Descriptor) = this.field(action, descriptor.owner, descriptor.name, descriptor.desc)
 
 fun InsnListBuilder.field(action: FieldAction, owner: String, name: String, desc: String) {
-    //TODO: Create our own utility so we can go from deobf -> obf
-    val realName = if (!AsmHelper.deobf) FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(owner, name, desc)
-    else name
+    val realName = AsmHelper.remapper.remapFieldName(owner, name, desc)
 
     insnList.add(FieldInsnNode(
         action.opcode,
@@ -41,7 +39,10 @@ fun InsnListBuilder.updateLocalField(descriptor: Descriptor, updater: InsnListBu
     field(FieldAction.PUT_FIELD, descriptor)
 }
 
-fun InsnListBuilder.setLocalField(descriptor: Descriptor) {
+fun InsnListBuilder.setLocalField(descriptor: Descriptor, newValue: InsnListBuilder.() -> Unit) {
     aload(0)
+
+    this.newValue()
+
     field(FieldAction.PUT_FIELD, descriptor)
 }

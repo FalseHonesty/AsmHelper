@@ -13,19 +13,14 @@ import org.objectweb.asm.tree.MethodNode
 class InjectWriter(
     className: String,
     private val methodName: String,
+    private val methodDesc: String,
     private val at: At,
-    private val insnList: InsnList,
-    private val methodDesc: String? = null
+    private val insnList: InsnListBuilder.() -> Unit
 ) : AsmWriter(className) {
     override fun transform(classNode: ClassNode) {
         classNode.methods
-            .filter { if (methodDesc != null) it.desc == methodDesc else true }
             .find {
-                if (!AsmHelper.deobf) {
-                    FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(classNode.name, it.name, it.desc) == methodName
-                } else {
-                    it.name == methodName
-                }
+                it.desc == methodDesc && AsmHelper.remapper.remapMethodName(classNode.name, methodName, methodDesc) == it.name
             }
             ?.let { injectInsnList(it) }
     }
@@ -33,10 +28,13 @@ class InjectWriter(
     private fun injectInsnList(method: MethodNode) {
         val nodes = at.getTargetedNodes(method)
 
-        nodes.forEach { insertToNode(method, it) }
+        val builder = InsnListBuilder(method)
+        builder.insnList()
+
+        nodes.forEach { insertToNode(method, it, builder.build()) }
     }
 
-    private fun insertToNode(method: MethodNode, node: AbstractInsnNode) {
+    private fun insertToNode(method: MethodNode, node: AbstractInsnNode, insnList: InsnList) {
         var newNode = node
 
         if (at.shift < 0) {
@@ -57,30 +55,26 @@ class InjectWriter(
     }
 
     override fun toString(): String {
-        return "AsmWriter{className=$className, methodName=$methodName, at=$at}"
+        return "InjectWriter{className=$className, methodName=$methodName, methodDesc=$methodDesc, at=$at}"
     }
 
     class Builder {
-        var className: String? = null
-        var methodName: String? = null
-        var at: At? = null
-        var insnListData: InsnList? = null
+        lateinit var className: String
+        lateinit var methodName: String
+        lateinit var methodDesc: String
+        lateinit var at: At
+        lateinit var insnListBuilder: InsnListBuilder.() -> Unit
 
         @Throws(IllegalStateException::class)
         fun build(): AsmWriter {
             return InjectWriter(
-                className ?: throw IllegalStateException("className must NOT be null."),
-                methodName ?: throw IllegalStateException("methodName must NOT be null."),
-                at ?: throw IllegalStateException("at must NOT be null."),
-                insnListData ?: throw IllegalStateException("insnListData must NOT be null.")
+                className, methodName, methodDesc,
+                at, insnListBuilder
             )
         }
 
         fun insnList(config: InsnListBuilder.() -> Unit) {
-            val builder = InsnListBuilder()
-            builder.config()
-
-            this.insnListData = builder.build()
+            this.insnListBuilder = config
         }
     }
 }

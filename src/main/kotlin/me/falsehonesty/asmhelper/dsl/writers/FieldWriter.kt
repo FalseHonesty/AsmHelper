@@ -11,7 +11,6 @@ class FieldWriter(
     private val fieldName: String,
     private val fieldDesc: String,
     private val initialValue: Any?,
-    private val initializer: InsnList?,
     private val accessTypes: List<AccessType>
 ) : AsmWriter(className) {
     override fun transform(classNode: ClassNode) {
@@ -22,14 +21,6 @@ class FieldWriter(
             null,
             initialValue
         ))
-
-        if (initializer != null) {
-            val insns = classNode.methods
-                .find { it.name == "<init>" }
-                ?.instructions ?: return
-
-            insns.insertBefore(insns.last.previous, initializer)
-        }
     }
 
     override fun toString(): String {
@@ -42,7 +33,6 @@ class FieldWriter(
         var fieldName: String? = null
         var fieldDesc: String? = null
         var initialValue: Any? = null
-        var initializer: InsnList? = null
 
         @Throws(IllegalStateException::class)
         fun build(): AsmWriter {
@@ -51,16 +41,8 @@ class FieldWriter(
                 fieldName ?: throw IllegalStateException("fieldName must not be null"),
                 fieldDesc ?: throw IllegalStateException("fieldDesc must not be null"),
                 initialValue,
-                initializer,
                 accessTypes
             )
-        }
-
-        fun initializer(config: InsnListBuilder.() -> Unit) {
-            val builder = InsnListBuilder()
-            builder.config()
-
-            this.initializer = builder.build()
         }
     }
 }

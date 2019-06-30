@@ -18,8 +18,20 @@ abstract class BaseClassTransformer : IClassTransformer {
         classLoader.addTransformerExclusion("me.falsehonesty.asmhelper.")
         classLoader.addTransformerExclusion(this.javaClass.name)
 
+        setup(classLoader)
+
         makeTransformers()
     }
+
+    /**
+     * Enables debug class loading. This means all transformed classes will be printed.
+     */
+    protected fun debugClassLoading() {
+        System.setProperty("legacy.debugClassLoading", "true")
+        System.setProperty("legacy.debugClassLoadingSave", "true")
+    }
+
+    protected open fun setup(classLoader: LaunchClassLoader) {}
 
     /**
      * This is where you would place all of your asm helper dsl magic
@@ -42,14 +54,14 @@ abstract class BaseClassTransformer : IClassTransformer {
         }
 
         val writers = AsmHelper.asmWriters
-            .filter { it.className == transformedName }
+            .filter { it.className.replace('/', '.') == transformedName }
             .ifEmpty { return basicClass }
 
         logger.info("Transforming class {}", transformedName)
 
         val classReader = ClassReader(basicClass)
         val classNode = ClassNode()
-        classReader.accept(classNode, ClassReader.EXPAND_FRAMES)
+        classReader.accept(classNode, ClassReader.SKIP_FRAMES)
 
         writers.forEach {
             logger.info("Applying AsmWriter {} to class {}", it, transformedName)

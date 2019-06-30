@@ -1,10 +1,7 @@
 package me.falsehonesty.asmhelper.example
 
 import me.falsehonesty.asmhelper.BaseClassTransformer
-import me.falsehonesty.asmhelper.dsl.At
-import me.falsehonesty.asmhelper.dsl.InjectionPoint
-import me.falsehonesty.asmhelper.dsl.applyField
-import me.falsehonesty.asmhelper.dsl.inject
+import me.falsehonesty.asmhelper.dsl.*
 import me.falsehonesty.asmhelper.dsl.instructions.*
 import me.falsehonesty.asmhelper.dsl.writers.AccessType
 
@@ -12,12 +9,16 @@ class TestClassTransformer : BaseClassTransformer() {
     override fun makeTransformers() {
         injectCountField()
         injectCountPrint()
+        injectDrawSplashScreen()
+
+        world()
     }
 
-    private fun injectCountPrint() = inject {
+    private fun injectCountPrint() = overwrite {
         className = "net.minecraft.client.gui.GuiNewChat"
         methodName = "printChatMessage"
-        at = At(InjectionPoint.HEAD)
+        methodDesc = "(Lnet/minecraft/util/IChatComponent;)V"
+//        at = At(InjectionPoint.HEAD)
 
         insnList {
             field(FieldAction.GET_STATIC, "java/lang/System", "out", "Ljava/io/PrintStream;")
@@ -28,8 +29,11 @@ class TestClassTransformer : BaseClassTransformer() {
             getLocalField(testMessagesSent)
             invoke(InvokeType.VIRTUAL, "java/lang/StringBuilder", "append", "(I)Ljava/lang/StringBuilder;")
 
-            ldc(" messages sent so far")
-            invoke(InvokeType.VIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;")
+            invoke(InvokeType.VIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;") {
+                argument {
+                    ldc(" messages sent so far")
+                }
+            }
 
             invoke(InvokeType.VIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;")
             invoke(InvokeType.VIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/Object;)V")
@@ -38,6 +42,8 @@ class TestClassTransformer : BaseClassTransformer() {
                 bipush(1)
                 iadd()
             }
+
+            methodReturn()
         }
     }
 
@@ -52,6 +58,7 @@ class TestClassTransformer : BaseClassTransformer() {
     private fun injectSuper() = inject {
         className = "net.minecraft.entity.EntityLivingBase"
         methodName = "getLook"
+        methodDesc = "(F)Lnet/minecraft/util/Vec3;"
         at = At(InjectionPoint.HEAD)
 
         insnList {
@@ -66,6 +73,24 @@ class TestClassTransformer : BaseClassTransformer() {
                 invoke(InvokeType.SPECIAL, "net/minecraft/entity/Entity", "getLook", "(F)Lnet/minecraft/util/Vec3;")
                 areturn()
             }
+        }
+    }
+
+    private fun injectDrawSplashScreen() = overwrite {
+        className = "net.minecraft.client.Minecraft"
+        methodName = "drawSplashScreen"
+        methodDesc = "(Lnet/minecraft/client/renderer/texture/TextureManager;)V"
+
+        insnList {
+            placeLabel(makeLabel())
+
+            invokeKOBjectFunction(
+                "me/falsehonesty/asmhelper/example/TestHelper",
+                "drawSplash",
+                "()V"
+            )
+
+            methodReturn()
         }
     }
 }

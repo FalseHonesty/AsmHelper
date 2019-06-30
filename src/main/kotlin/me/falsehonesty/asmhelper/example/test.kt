@@ -10,3 +10,7 @@ import me.falsehonesty.asmhelper.dsl.InjectionPoint
 //        println("x")
 //    }
 //}
+
+fun TestClassTransformer.world() {
+
+}

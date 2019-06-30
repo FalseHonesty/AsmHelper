@@ -3,12 +3,13 @@ package me.falsehonesty.asmhelper.dsl.instructions
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.InsnList
 import org.objectweb.asm.tree.InsnNode
+import org.objectweb.asm.tree.MethodNode
 
 /**
  * Gets an instance of a Kotlin Object.
  */
 fun InsnListBuilder.getKObjectInstance(objectClassName: String) {
-    field(FieldAction.GET_STATIC, objectClassName, "INSTANCE", "L$objectClassName")
+    field(FieldAction.GET_STATIC, objectClassName, "INSTANCE", "L$objectClassName;")
 }
 
 /**
@@ -17,10 +18,10 @@ fun InsnListBuilder.getKObjectInstance(objectClassName: String) {
  * Behind the scenes, this produces bytecode that gets the Object instance, and
  * then calls the method.
  */
-fun InsnListBuilder.invokeKOBjectFunction(objectClassName: String, methodName: String, methodDesc: String) {
+fun InsnListBuilder.invokeKOBjectFunction(objectClassName: String, methodName: String, methodDesc: String, arguments: (InsnListBuilder.() -> Unit)? = null) {
     getKObjectInstance(objectClassName)
 
-    invoke(InvokeType.VIRTUAL, objectClassName, methodName, methodDesc)
+    invoke(InvokeType.VIRTUAL, objectClassName, methodName, methodDesc, arguments)
 }
 
 /**
@@ -73,6 +74,9 @@ fun InsnListBuilder.float(number: Float) {
  * Helper for creating an if clause.
  *
  * Jumps into the provided code if and only if the provided condition(s) is/are TRUE.
+ * NOTE: This works somewhat inversely to a normal if statement. The code inside the if
+ * will be SKIPPED if at least ONE of your jump conditions is true. While this may seem counterintuitive,
+ * it better lines up with how JVM Bytecode actually works.
  *
  * If you have multiple conditions, they will be called in the order they are passed. Because of that,
  * you must set up the stack accordingly.
@@ -109,7 +113,7 @@ inline fun InsnListBuilder.createInstance(className: String, constructorDescript
 }
 
 inline fun InsnListBuilder.ifElseClause(vararg conditions: JumpCondition, builder: IfElseBuilder.() -> Unit) {
-    val ifElse = IfElseBuilder()
+    val ifElse = IfElseBuilder(toInjectInto)
 
     ifElse.builder()
 
@@ -131,12 +135,12 @@ inline fun InsnListBuilder.ifElseClause(vararg conditions: JumpCondition, builde
     placeLabel(endLabel)
 }
 
-class IfElseBuilder {
+class IfElseBuilder(val methodNode: MethodNode) {
     var ifCode = InsnList()
     var elseCode = InsnList()
 
     fun ifCode(builder: InsnListBuilder.() -> Unit) {
-        val insn = InsnListBuilder()
+        val insn = InsnListBuilder(methodNode)
 
         insn.builder()
 
@@ -144,10 +148,15 @@ class IfElseBuilder {
     }
 
     fun elseCode(builder: InsnListBuilder.() -> Unit) {
-        val insn = InsnListBuilder()
+        val insn = InsnListBuilder(methodNode)
 
         insn.builder()
 
         elseCode = insn.build()
     }
+}
+
+enum class BooleanLogic {
+    AND,
+    OR
 }

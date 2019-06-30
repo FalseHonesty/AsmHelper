@@ -21,7 +21,7 @@ data class At(val value: InjectionPoint, val before: Boolean = true, val shift: 
             is InjectionPoint.TAIL -> listOf(method.instructions.last.previous)
             is InjectionPoint.RETURN -> method.instructions.iterator().asSequence().toList().filter {
                 it.opcode == Opcodes.RETURN
-            }
+            }.let { if (value.ordinal != null) listOf(it[value.ordinal]) else it }
             is InjectionPoint.INVOKE -> method.instructions.iterator().asSequence().toList().filter {
                 val descriptor = value.descriptor
 
@@ -29,14 +29,42 @@ data class At(val value: InjectionPoint, val before: Boolean = true, val shift: 
                         && it.desc == descriptor.desc
                         && it.name == descriptor.name
                         && it.owner == descriptor.owner
-            }
+            }.let { if (value.ordinal != null) listOf(it[value.ordinal]) else it }
+            is InjectionPoint.CUSTOM -> value.finder(method)
         }
     }
 }
 
 sealed class InjectionPoint {
     object HEAD : InjectionPoint()
-    object RETURN : InjectionPoint()
-    class INVOKE(val descriptor: Descriptor) : InjectionPoint()
+
+    /**
+     * Injects to where a return operation is made.
+     *
+     * Normally, this injects into every return opcode that fits this description, however,
+     * optionally one can specify the exact opcode to inject to by specifying [ordinal].
+     * This value (0 indexed) is the index of the operation you want.
+     */
+    class RETURN(val ordinal: Int? = null) : InjectionPoint()
+
+    /**
+     * Injects to where an invoke operation is made.
+     *
+     * Normally, this injects into every invoke opcode that fits this description, however,
+     * optionally one can specify the exact opcode to inject to by specifying [ordinal].
+     * This value (0 indexed) is the index of the operation you want.
+     */
+    class INVOKE(val descriptor: Descriptor, val ordinal: Int? = null) : InjectionPoint()
+
+    /**
+     * Injects into the very very end of a method, before the final return.
+     */
     object TAIL : InjectionPoint()
+
+    /**
+     * Allows the user to find their own injection points. The method node
+     * to be searched is passed in, and the finder method should return
+     * a list of nodes to be injected to. The list can be of size >= 0.
+     */
+    class CUSTOM(val finder: (MethodNode) -> List<AbstractInsnNode>) : InjectionPoint()
 }
