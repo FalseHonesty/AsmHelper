@@ -40,6 +40,7 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile group: 'org.objenesis', name: 'objenesis', version: '3.0.1'
 }
 
 processResources {
