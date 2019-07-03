@@ -9,17 +9,18 @@ class TestClassTransformer : BaseClassTransformer() {
     override fun makeTransformers() {
         injectCountField()
         injectCountPrint()
-        injectDrawSplashScreen()
+        // injectDrawSplashScreen()
         injectEntityPlayer()
 
         world()
     }
 
-    private fun injectCountPrint() = overwrite {
+    private fun injectCountPrint() = inject {
         className = "net.minecraft.client.gui.GuiNewChat"
         methodName = "printChatMessage"
         methodDesc = "(Lnet/minecraft/util/IChatComponent;)V"
-//        at = At(InjectionPoint.HEAD)
+
+        at = At(InjectionPoint.HEAD)
 
         insnList {
             field(FieldAction.GET_STATIC, "java/lang/System", "out", "Ljava/io/PrintStream;")
@@ -30,7 +31,12 @@ class TestClassTransformer : BaseClassTransformer() {
             getLocalField(testMessagesSent)
             invoke(InvokeType.VIRTUAL, "java/lang/StringBuilder", "append", "(I)Ljava/lang/StringBuilder;")
 
-            invoke(InvokeType.VIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;") {
+            invoke(
+                InvokeType.VIRTUAL,
+                "java/lang/StringBuilder",
+                "append",
+                "(Ljava/lang/String;)Ljava/lang/StringBuilder;"
+            ) {
                 ldc(" messages sent so far")
             }
 
@@ -41,9 +47,20 @@ class TestClassTransformer : BaseClassTransformer() {
                 bipush(1)
                 iadd()
             }
-
-            methodReturn()
         }
+
+        // val testMessagesSent = shadowField<Int>()
+        // val getChatOpen = shadowMethod<Boolean>()
+        //
+        // code {
+        //     TestObj.printWhenChatted(testMessagesSent)
+        //
+        //     val open = getChatOpen()
+        //     TestObj.doThing(getChatOpen())
+        //     deleteChatLine()
+        //
+        //     testMessagesSent++
+        // }
     }
 
     private fun injectCountField() = applyField {
@@ -97,7 +114,7 @@ class TestClassTransformer : BaseClassTransformer() {
         )
 
         insnList {
-            invokeKOBjectFunction(CLIENT_LISTENER, "onDropItem", "(L$ENTITY_PLAYER;L$ITEM_STACK;)Z") {
+            invokeKObjectFunction(CLIENT_LISTENER, "onDropItem", "(L$ENTITY_PLAYER;L$ITEM_STACK;)Z") {
                 aload(0)
 
                 getLocalField(ENTITY_PLAYER, "inventory", "L$INVENTORY_PLAYER;")
@@ -132,21 +149,29 @@ class TestClassTransformer : BaseClassTransformer() {
         }
     }
 
-    private fun injectDrawSplashScreen() = overwrite {
-        className = "net.minecraft.client.Minecraft"
-        methodName = "drawSplashScreen"
-        methodDesc = "(Lnet/minecraft/client/renderer/texture/TextureManager;)V"
+//    private fun injectDrawSplashScreen() = overwrite {
+//        className = "net.minecraft.client.Minecraft"
+//        methodName = "drawSplashScreen"
+//        methodDesc = "(Lnet/minecraft/client/renderer/texture/TextureManager;)V"
+//
+//        insnList {
+//            invokeKOBjectFunction(
+//                "me/falsehonesty/asmhelper/example/TestHelper",
+//                "drawSplash",
+//                "()V"
+//            )
+//
+//            methodReturn()
+//        }
+//    }
+}
 
-        insnList {
-            placeLabel(makeLabel())
+object TestObj {
+    fun printWhenChatted(messages: Int) {
+        println("$messages printed so far.")
+    }
 
-            invokeKOBjectFunction(
-                "me/falsehonesty/asmhelper/example/TestHelper",
-                "drawSplash",
-                "()V"
-            )
-
-            methodReturn()
-        }
+    fun doThing(b: Boolean) {
+        println("open? $b")
     }
 }

@@ -4,18 +4,27 @@ import me.falsehonesty.asmhelper.AsmHelper
 import me.falsehonesty.asmhelper.AsmHelper.logger
 import me.falsehonesty.asmhelper.dsl.AsmWriter
 import me.falsehonesty.asmhelper.dsl.At
+import me.falsehonesty.asmhelper.dsl.code.InjectCodeBuilder
+import me.falsehonesty.asmhelper.dsl.instructions.Descriptor
 import me.falsehonesty.asmhelper.dsl.instructions.InsnListBuilder
+import org.objectweb.asm.ClassReader
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.InsnList
 import org.objectweb.asm.tree.MethodNode
+import org.objenesis.ObjenesisHelper
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 class InjectWriter(
     className: String,
     private val methodName: String,
     private val methodDesc: String,
     private val at: At,
-    private val insnList: InsnListBuilder.() -> Unit,
+    private val insnListBuilder: (InsnListBuilder.() -> Unit)?,
+    private val codeBuilder: (() -> Unit)?,
     private val fieldMaps: Map<String, String>,
     private val methodMaps: Map<String, String>
 ) : AsmWriter(className) {
@@ -30,20 +39,46 @@ class InjectWriter(
 
                 remappedDesc == methodDesc && (remapped == methodName || methodMaps[remapped] == methodName)
             }
-            ?.let { injectInsnList(it) } ?: logger.error("No methods found for target $methodName")
+            ?.let { injectInsnList(it, classNode) } ?: logger.error("No methods found for target $methodName")
     }
 
-    private fun injectInsnList(method: MethodNode) {
+    private fun injectInsnList(method: MethodNode, classNode: ClassNode) {
         val nodes = at.getTargetedNodes(method)
 
-        val builder = InsnListBuilder(method)
-        builder.insnList()
+        val instructions = when {
+            insnListBuilder != null && codeBuilder != null -> {
+                logger.error("$this specifies both an insnList and a codeBlock, please pick one or the other.")
+                return
+            }
+            insnListBuilder != null -> {
+                val builder = InsnListBuilder(method)
+                insnListBuilder.let { builder.it() }
+                builder.build()
+            }
+            codeBuilder != null -> {
+                val clazz = codeBuilder.javaClass
+                val clazzName = clazz.name
+                val clazzPath = clazzName.replace('.', '/') + ".class"
+                val clazzInputStream = clazz.classLoader.getResourceAsStream(clazzPath)
 
-        if (nodes.isEmpty()) {
-            logger.error("Couldn't find any matching nodes for $this")
+                val clazzReader = ClassReader(clazzInputStream)
+                val codeClassNode = ClassNode()
+                clazzReader.accept(codeClassNode, ClassReader.SKIP_FRAMES)
+
+                val codeBuilder = InjectCodeBuilder(codeClassNode, classNode, method)
+
+                codeBuilder.codeBlockToInstructions()
+            }
+            else -> {
+                logger.error("$this does not have instructions to inject. You must specify an insnList or codeBlock.")
+                return
+            }
         }
 
-        nodes.forEach { insertToNode(method, it, builder.build()) }
+        if (nodes.isEmpty())
+            logger.error("Couldn't find any matching nodes for $this")
+
+        nodes.forEach { insertToNode(method, it, instructions) }
     }
 
     private fun insertToNode(method: MethodNode, node: AbstractInsnNode, insnList: InsnList) {
@@ -75,7 +110,8 @@ class InjectWriter(
         lateinit var methodName: String
         lateinit var methodDesc: String
         lateinit var at: At
-        lateinit var insnListBuilder: InsnListBuilder.() -> Unit
+        private var insnListBuilder: (InsnListBuilder.() -> Unit)? = null
+        private var codeBuilder: (() -> Unit)? = null
         var fieldMaps = mapOf<String, String>()
         var methodMaps = mapOf<String, String>()
 
@@ -83,7 +119,7 @@ class InjectWriter(
         fun build(): AsmWriter {
             return InjectWriter(
                 className, methodName, methodDesc,
-                at, insnListBuilder,
+                at, insnListBuilder, codeBuilder,
                 fieldMaps, methodMaps
             )
         }
@@ -91,5 +127,17 @@ class InjectWriter(
         fun insnList(config: InsnListBuilder.() -> Unit) {
             this.insnListBuilder = config
         }
+
+        fun code(code: () -> Unit) {
+            this.codeBuilder = code
+        }
+
+        inline fun <reified T> shadowField(): T = ObjenesisHelper.newInstance(T::class.java)
+
+        inline fun <reified L> shadowListField(): List<L> = shadowField<ArrayList<L>>()
+
+        inline fun <reified R> shadowMethod(): () -> R = { ObjenesisHelper.newInstance(R::class.java) }
     }
 }
+
+fun asm(bytecode: InsnListBuilder.() -> Unit) {}

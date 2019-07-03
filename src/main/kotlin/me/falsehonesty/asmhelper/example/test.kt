@@ -2,6 +2,7 @@ package me.falsehonesty.asmhelper.example
 
 import me.falsehonesty.asmhelper.BaseClassTransformer
 import me.falsehonesty.asmhelper.dsl.InjectionPoint
+import me.falsehonesty.asmhelper.dsl.inject
 
 //fun bytecodePlayground() {
 //    var i = x()
@@ -13,4 +14,12 @@ import me.falsehonesty.asmhelper.dsl.InjectionPoint
 
 fun TestClassTransformer.world() {
 
+}
+
+fun eee() = inject {
+    val variable = Any()
+
+    code {
+        println(variable.hashCode())
+    }
 }
