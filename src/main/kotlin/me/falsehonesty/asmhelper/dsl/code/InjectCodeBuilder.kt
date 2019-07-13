@@ -10,11 +10,11 @@ class InjectCodeBuilder(codeClassNode: ClassNode, targetClassNode: ClassNode, ta
     CodeBuilder(codeClassNode) {
 
     override val modifiers: List<Modifier> = listOf(
+        RemoveReturnModifier(),
         LocalVarModifier(targetMethodNode),
         AsmBlockModifier(targetMethodNode),
         ShadowedMethodModifier(codeClassNode.name, targetClassNode, getMethodNode()),
         ShadowedLocalModifier(codeClassNode.name),
-        ShadowedFieldModifier(codeClassNode.name, targetClassNode),
-        RemoveReturnModifier()
+        ShadowedFieldModifier(codeClassNode.name, targetClassNode)
     )
 }

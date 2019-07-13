@@ -17,10 +17,15 @@ abstract class CodeBuilder(val codeClassNode: ClassNode) {
         verbose("Transforming code class ${codeClassNode.name}")
         verbose("Initial instruction list:")
         verbose("\n" + instructions.prettyString())
+        verbose("-----------------")
 
         modifiers.forEach {
+            verbose("Running cycle $it")
+            verbose("-----------------")
+
             it.modify(instructions)
 
+            verbose("-----------------")
             verbose("After cycle $it")
             verbose("\n" + instructions.prettyString())
         }
