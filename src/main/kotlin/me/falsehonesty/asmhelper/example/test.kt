@@ -15,11 +15,3 @@ import me.falsehonesty.asmhelper.dsl.inject
 fun TestClassTransformer.world() {
 
 }
-
-fun eee() = inject {
-    val variable = Any()
-
-    code {
-        println(variable.hashCode())
-    }
-}

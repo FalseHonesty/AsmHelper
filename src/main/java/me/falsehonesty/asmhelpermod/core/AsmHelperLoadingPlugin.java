@@ -1,5 +1,6 @@
 package me.falsehonesty.asmhelpermod.core;
 
+import me.falsehonesty.asmhelpermod.AsmHelperMod;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
 import java.util.Map;
@@ -14,7 +15,7 @@ public class AsmHelperLoadingPlugin implements IFMLLoadingPlugin {
 
     @Override
     public String getModContainerClass() {
-        return null;
+        return AsmHelperMod.class.getName();
     }
 
     @Override

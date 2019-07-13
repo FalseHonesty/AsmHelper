@@ -4,6 +4,7 @@ import me.falsehonesty.asmhelper.BaseClassTransformer
 import me.falsehonesty.asmhelper.dsl.*
 import me.falsehonesty.asmhelper.dsl.instructions.*
 import me.falsehonesty.asmhelper.dsl.writers.AccessType
+import net.minecraft.util.IChatComponent
 
 class TestClassTransformer : BaseClassTransformer() {
     override fun makeTransformers() {
@@ -22,30 +23,46 @@ class TestClassTransformer : BaseClassTransformer() {
 
         at = At(InjectionPoint.HEAD)
 
-        insnList {
-            field(FieldAction.GET_STATIC, "java/lang/System", "out", "Ljava/io/PrintStream;")
-            createInstance("java/lang/StringBuilder", "()V")
+        // insnList {
+        //     field(FieldAction.GET_STATIC, "java/lang/System", "out", "Ljava/io/PrintStream;")
+        //     createInstance("java/lang/StringBuilder", "()V")
+        //
+        //     val testMessagesSent = Descriptor("net/minecraft/client/gui/GuiNewChat", "testMessagesSent", "I")
+        //
+        //     getLocalField(testMessagesSent)
+        //     invoke(InvokeType.VIRTUAL, "java/lang/StringBuilder", "append", "(I)Ljava/lang/StringBuilder;")
+        //
+        //     invoke(
+        //         InvokeType.VIRTUAL,
+        //         "java/lang/StringBuilder",
+        //         "append",
+        //         "(Ljava/lang/String;)Ljava/lang/StringBuilder;"
+        //     ) {
+        //         ldc(" messages sent so far")
+        //     }
+        //
+        //     invoke(InvokeType.VIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;")
+        //     invoke(InvokeType.VIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/Object;)V")
+        //
+        //     updateLocalField(testMessagesSent) {
+        //         bipush(1)
+        //         iadd()
+        //     }
+        // }
 
-            val testMessagesSent = Descriptor("net/minecraft/client/gui/GuiNewChat", "testMessagesSent", "I")
+        codeBlock {
+            val deleteChatLine = shadowMethod<Unit, Int>()
+            val printChatMessageWithOptionalDeletion = shadowMethod<Unit, IChatComponent, Int>()
+            val local1 = shadowLocal<IChatComponent>()
 
-            getLocalField(testMessagesSent)
-            invoke(InvokeType.VIRTUAL, "java/lang/StringBuilder", "append", "(I)Ljava/lang/StringBuilder;")
+            code {
+                deleteChatLine(1337)
 
-            invoke(
-                InvokeType.VIRTUAL,
-                "java/lang/StringBuilder",
-                "append",
-                "(Ljava/lang/String;)Ljava/lang/StringBuilder;"
-            ) {
-                ldc(" messages sent so far")
-            }
+                if (local1.unformattedText.contains("ee")) {
+                    // TODO: return from target method
 
-            invoke(InvokeType.VIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;")
-            invoke(InvokeType.VIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/Object;)V")
-
-            updateLocalField(testMessagesSent) {
-                bipush(1)
-                iadd()
+                    printChatMessageWithOptionalDeletion(local1, 1337)
+                }
             }
         }
 

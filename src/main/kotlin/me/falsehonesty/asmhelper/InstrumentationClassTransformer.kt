@@ -1,5 +1,6 @@
 package me.falsehonesty.asmhelper
 
+import me.falsehonesty.asmhelper.printing.log
 import org.apache.logging.log4j.LogManager
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
@@ -8,7 +9,6 @@ import java.lang.instrument.ClassFileTransformer
 import java.security.ProtectionDomain
 
 abstract class InstrumentationClassTransformer : ClassFileTransformer {
-    private val logger = LogManager.getLogger("AsmHelper")
     private var calledSetup = false
 
     private fun setup() {
@@ -34,7 +34,7 @@ abstract class InstrumentationClassTransformer : ClassFileTransformer {
         }
 
         AsmHelper.classReplacers[className]?.let { classFile ->
-            logger.info("Completely replacing {} with data from {}.", className, classFile)
+            log("Completely replacing $className with data from $classFile.")
 
             return loadClassResource(classFile)
         }
@@ -43,14 +43,14 @@ abstract class InstrumentationClassTransformer : ClassFileTransformer {
             .filter { it.className.replace('/', '.') == className }
             .ifEmpty { return basicClass }
 
-        logger.info("Transforming class {}", className)
+        log("Transforming class $className")
 
         val classReader = ClassReader(basicClass)
         val classNode = ClassNode()
         classReader.accept(classNode, ClassReader.EXPAND_FRAMES)
 
         writers.forEach {
-            logger.info("Applying AsmWriter {} to class {}", it, className)
+            log("Applying AsmWriter $it to class $className")
 
             it.transform(classNode)
         }
@@ -59,7 +59,7 @@ abstract class InstrumentationClassTransformer : ClassFileTransformer {
         try {
             classNode.accept(classWriter)
         } catch (e: Throwable) {
-            logger.error("Exception when transforming {} : {}", className, e.javaClass.simpleName)
+            log("Exception when transforming $className : ${e.javaClass.simpleName}")
             e.printStackTrace()
         }
 

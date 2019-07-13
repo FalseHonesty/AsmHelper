@@ -50,7 +50,7 @@ abstract class BaseClassTransformer : IClassTransformer {
         }
 
         AsmHelper.classReplacers[transformedName]?.let { classFile ->
-            logger.info("Completely replacing {} with data from {}.", transformedName, classFile)
+            logger.info("Completely replacing $transformedName with data from $classFile.")
 
             return loadClassResource(classFile)
         }
@@ -59,7 +59,7 @@ abstract class BaseClassTransformer : IClassTransformer {
             .filter { it.className.replace('/', '.') == transformedName }
             .ifEmpty { return basicClass }
 
-        logger.info("Transforming class {}", transformedName)
+        logger.info("Transforming class $transformedName")
 
         val classReader = ClassReader(basicClass)
         val classNode = ClassNode()
@@ -69,7 +69,7 @@ abstract class BaseClassTransformer : IClassTransformer {
         classNode.version = Opcodes.V1_8
 
         writers.forEach {
-            logger.info("Applying AsmWriter {} to class {}", it, transformedName)
+            logger.info("Applying AsmWriter $it to class $transformedName")
 
             it.transform(classNode)
         }
@@ -78,8 +78,7 @@ abstract class BaseClassTransformer : IClassTransformer {
         try {
             classNode.accept(classWriter)
         } catch (e: Throwable) {
-            logger.error("Exception when transforming {} : {}", transformedName, e.javaClass.simpleName)
-            e.printStackTrace()
+            logger.error("Exception when transforming $transformedName : ${e.javaClass.simpleName}", e)
         }
 
         return classWriter.toByteArray()

@@ -1,7 +1,30 @@
 package me.falsehonesty.asmhelper.dsl.code
 
+import me.falsehonesty.asmhelper.dsl.code.modifiers.Modifier
+import me.falsehonesty.asmhelper.printing.prettyString
+import me.falsehonesty.asmhelper.printing.verbose
 import org.objectweb.asm.tree.ClassNode
+import org.objectweb.asm.tree.InsnList
 
-abstract class CodeBuilder(val classNode: ClassNode) {
-    protected fun getMethodNode() = classNode.methods.find { it.name == "invoke" && it.desc == "()V" }!!
+abstract class CodeBuilder(val codeClassNode: ClassNode) {
+    abstract val modifiers: List<Modifier>
+
+    protected fun getMethodNode() = codeClassNode.methods.find { it.name == "invoke" && it.desc == "()V" }!!
+
+    fun transformToInstructions(): InsnList {
+        val instructions = getMethodNode().instructions
+
+        verbose("Transforming code class ${codeClassNode.name}")
+        verbose("Initial instruction list:")
+        verbose("\n" + instructions.prettyString())
+
+        modifiers.forEach {
+            it.modify(instructions)
+
+            verbose("After cycle $it")
+            verbose("\n" + instructions.prettyString())
+        }
+
+        return instructions
+    }
 }
