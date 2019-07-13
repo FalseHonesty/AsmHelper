@@ -1,5 +1,7 @@
 package me.falsehonesty.asmhelper.dsl.code.modifiers
 
+import me.falsehonesty.asmhelper.printing.prettyString
+import me.falsehonesty.asmhelper.printing.verbose
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.*
@@ -34,6 +36,8 @@ class ShadowedMethodModifier(codeBlockClass: String, val targetClassNode: ClassN
         POP
          */
 
+        verbose("${node.prettyString()} looks to be a shadowed method. Transforming now...")
+
         var searchNode = node.next
         val finalCall: MethodInsnNode
 
@@ -43,6 +47,9 @@ class ShadowedMethodModifier(codeBlockClass: String, val targetClassNode: ClassN
                 break
             } else if (searchNode is MethodInsnNode && searchNode.owner.startsWith("java/lang") && searchNode.name == "valueOf") {
                 // This is a primitive -> wrapper call, we probably don't want it!
+
+                verbose("Found primitive -> wrapper call, likely an artifact from Kotlin's boxing, so let's toss it.")
+                verbose(searchNode.prettyString())
 
                 val tmp = searchNode.next
                 instructions.remove(searchNode)
@@ -68,6 +75,9 @@ class ShadowedMethodModifier(codeBlockClass: String, val targetClassNode: ClassN
 
         argumentTypes.reverse()
 
+        verbose("Theoretically, the stack would look like this when the method is called: ${argumentTypes.toList()}")
+        verbose("We want the top $numberOfArguments from it.")
+
         // Now we need to know the return type.
         val returnTypeIndicator = finalCall.next
 
@@ -81,7 +91,11 @@ class ShadowedMethodModifier(codeBlockClass: String, val targetClassNode: ClassN
             Type.VOID_TYPE
         }
 
+        verbose("The return type is believed to be $returnType")
+
         val syntheticMethodDesc = Type.getMethodDescriptor(returnType, *argumentTypes)
+
+        verbose("Synthetic method description has been formed: $syntheticMethodDesc")
 
         // TODO: Remap?
 
@@ -95,18 +109,24 @@ class ShadowedMethodModifier(codeBlockClass: String, val targetClassNode: ClassN
             false
         )
 
+        verbose("- ${node.prettyString()}")
         instructions.remove(node)
 
         instructions.insertBefore(finalCall, methodCall)
         instructions.remove(finalCall)
 
+        verbose("- ${finalCall.prettyString()}")
+        verbose("+ ${methodCall.prettyString()}")
+
         val possibleWrapperToPrim = returnTypeIndicator.next
+
+        verbose("- ${returnTypeIndicator.prettyString()}")
+        instructions.remove(returnTypeIndicator)
 
         if (possibleWrapperToPrim is MethodInsnNode && possibleWrapperToPrim.owner.startsWith("java/lang/") && possibleWrapperToPrim.name.endsWith("Value") && possibleWrapperToPrim.desc.startsWith("()")) {
             // We're pretty sure this is a Wrapper -> Primitive call, so we need to remove it!
+            verbose("- ${possibleWrapperToPrim.prettyString()}")
             instructions.remove(possibleWrapperToPrim)
         }
-
-        instructions.remove(returnTypeIndicator)
     }
 }

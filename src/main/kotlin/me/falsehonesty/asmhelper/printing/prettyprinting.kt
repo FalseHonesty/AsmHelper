@@ -1,5 +1,6 @@
 package me.falsehonesty.asmhelper.printing
 
+import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.InsnList
 import org.objectweb.asm.util.Textifier
 import org.objectweb.asm.util.TraceMethodVisitor
@@ -12,6 +13,16 @@ private val methodTracer = TraceMethodVisitor(textifier)
 fun InsnList.prettyString(): String {
     iterator().forEach { it.accept(methodTracer) }
 
+    return textifierToString()
+}
+
+fun AbstractInsnNode.prettyString(): String {
+    this.accept(methodTracer)
+
+    return textifierToString().trim()
+}
+
+private fun textifierToString(): String {
     val stringWriter = StringWriter()
     textifier.print(PrintWriter(stringWriter))
     textifier.getText().clear()
