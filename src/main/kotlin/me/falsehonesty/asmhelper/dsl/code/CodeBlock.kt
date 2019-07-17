@@ -1,7 +1,5 @@
 package me.falsehonesty.asmhelper.dsl.code
 
-import org.objenesis.ObjenesisHelper
-
 class CodeBlock {
     fun code(code: () -> Unit) {}
 

@@ -1,6 +1,7 @@
 package me.falsehonesty.asmhelper
 
 import me.falsehonesty.asmhelper.dsl.AsmWriter
+import me.falsehonesty.asmhelper.printing.log
 import me.falsehonesty.asmhelper.remapping.DeobfRemapper
 import me.falsehonesty.asmhelper.remapping.ForgeRemapper
 import me.falsehonesty.asmhelper.remapping.NotchRemapper
@@ -31,7 +32,7 @@ object AsmHelper {
             if (deobf) DeobfRemapper() else NotchRemapper()
         }
 
-        println("Selected the $remapper remapper")
+        log("Selected the $remapper remapper")
     }
 
     var verbose = System.getProperty("asmhelper.verbose", "false").toBoolean()

@@ -65,7 +65,7 @@ class ShadowedMethodModifier(codeBlockClass: String, val targetClassNode: ClassN
         // Because of this, we need to analyze the stack to find out what is actually being passed in.
         val numberOfArguments = Type.getArgumentTypes(finalCall.desc).size
 
-        val analyzedFrame = Analyzer(instructions).analyze(node.next, finalCall)
+        val analyzedFrame = Analyzer(instructions, codeBlockMethod).analyze(node.next, finalCall)
 
         val argumentTypes = arrayOfNulls<Type>(numberOfArguments)
 
