@@ -5,7 +5,6 @@ import me.falsehonesty.asmhelper.dsl.*
 import me.falsehonesty.asmhelper.dsl.instructions.*
 import me.falsehonesty.asmhelper.dsl.writers.AccessType
 import me.falsehonesty.asmhelper.dsl.writers.asm
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 
 class TestClassTransformer : BaseClassTransformer() {

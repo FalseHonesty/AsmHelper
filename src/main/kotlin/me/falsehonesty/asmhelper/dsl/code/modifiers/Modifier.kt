@@ -1,5 +1,7 @@
 package me.falsehonesty.asmhelper.dsl.code.modifiers
 
+import me.falsehonesty.asmhelper.printing.prettyString
+import me.falsehonesty.asmhelper.printing.verbose
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.*
@@ -41,7 +43,7 @@ abstract class Modifier {
     }
 }
 
-class Analyzer(val instructions: InsnList) {
+class Analyzer(val instructions: InsnList, val methodNode: MethodNode) {
     /**
      * Starts at [startInsn] inclusive, ends at [endInsn] exclusive.
      */
@@ -51,20 +53,23 @@ class Analyzer(val instructions: InsnList) {
         var node = startInsn
 
         while (node != endInsn) {
+            verbose("Analyzing ${node.prettyString()}")
+
             when (node) {
                 is MethodInsnNode -> {
                     repeat(Type.getArgumentTypes(node.desc).size) {
-                        stack.pop()
+                        verbose("Popping ${stack.pop()} off the stack because it is an argument")
                     }
 
-                    if (node.opcode != Opcodes.INVOKESTATIC) stack.pop()
+                    if (node.opcode != Opcodes.INVOKESTATIC) verbose("Popping receiver ${stack.pop()}")
 
                     val returnType = Type.getReturnType(node.desc)
                     if (returnType != Type.VOID_TYPE) stack.push(returnType)
+                    verbose("Pushed return type $returnType")
                 }
                 is VarInsnNode -> {
                     // TODO, make this load from local var table.
-                    if (node.opcode <= 53) stack.push(Type.VOID_TYPE)
+                    if (node.opcode <= 53) stack.push(Type.getObjectType(methodNode.localVariables[node.`var`].desc))
                     else stack.pop()
                 }
                 is FieldInsnNode -> {
@@ -99,9 +104,21 @@ class Analyzer(val instructions: InsnList) {
                         in 11..13 -> stack.push(Type.FLOAT_TYPE)
                         in 14..15 -> stack.push(Type.DOUBLE_TYPE)
                         in 96..115 -> stack.pop()
+                        89 -> stack.push(stack.peek())
+                    }
+                }
+                is TypeInsnNode -> {
+                    when (node.opcode) {
+                        Opcodes.NEW -> stack.push(Type.getObjectType(node.desc))
+                        Opcodes.CHECKCAST -> {
+                            stack.pop()
+                            stack.push(Type.getObjectType(node.desc))
+                        }
                     }
                 }
             }
+
+            verbose("Stack after analyzation frame looks like $stack")
 
             node = node.next
         }

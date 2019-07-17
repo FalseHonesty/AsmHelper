@@ -7,6 +7,8 @@ import me.falsehonesty.asmhelper.dsl.At
 import me.falsehonesty.asmhelper.dsl.code.CodeBlock
 import me.falsehonesty.asmhelper.dsl.code.InjectCodeBuilder
 import me.falsehonesty.asmhelper.dsl.instructions.InsnListBuilder
+import me.falsehonesty.asmhelper.printing.prettyString
+import me.falsehonesty.asmhelper.printing.verbose
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
@@ -40,7 +42,6 @@ class InjectWriter(
     private fun injectInsnList(method: MethodNode, classNode: ClassNode) {
         val nodes = at.getTargetedNodes(method)
 
-// <<<<<<< HEAD
         val instructions = when {
             insnListBuilder != null && codeBlockClassName != null -> {
                 logger.error("$this specifies both an insnList and a codeBlock, please pick one or the other.")
@@ -71,8 +72,13 @@ class InjectWriter(
 
         if (nodes.isEmpty())
             logger.error("Couldn't find any matching nodes for $this")
+        else
+            verbose("$this matched the following ${nodes.size} targets")
 
-        nodes.forEach { insertToNode(method, it, instructions) }
+        nodes.forEachIndexed { i, node ->
+            verbose("$i.    ${node.prettyString()}")
+            insertToNode(method, node, instructions)
+        }
     }
 
     private fun insertToNode(method: MethodNode, node: AbstractInsnNode, insnList: InsnList) {
