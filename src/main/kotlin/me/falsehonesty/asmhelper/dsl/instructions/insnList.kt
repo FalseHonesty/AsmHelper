@@ -291,6 +291,17 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
     fun makeLabel() = LabelNode()
 
     /**
+     * Finds the [n]th label in this method
+     */
+    fun findLabel(n: Int) = toInjectInto.instructions
+        .iterator()
+        .asSequence()
+        .toList()
+        .filterIsInstance<LabelNode>()
+        .sortedBy { it.label.offset }
+        .elementAt(n)
+
+    /**
      * Places a previously created label.
      */
     fun placeLabel(label: LabelNode) = apply { insn(label) }
