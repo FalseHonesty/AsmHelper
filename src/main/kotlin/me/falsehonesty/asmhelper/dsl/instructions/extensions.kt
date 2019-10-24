@@ -71,6 +71,18 @@ fun InsnListBuilder.float(number: Float) {
 }
 
 /**
+ * An abstraction over lconst and ldc, picking the best one
+ * available.
+ */
+fun InsnListBuilder.long(number: Long) {
+    when (number) {
+        0L -> lconst_0()
+        1L -> lconst_1()
+        else -> ldc(number)
+    }
+}
+
+/**
  * Helper for creating an if clause.
  *
  * Jumps into the provided code if and only if the provided condition(s) is/are TRUE.
