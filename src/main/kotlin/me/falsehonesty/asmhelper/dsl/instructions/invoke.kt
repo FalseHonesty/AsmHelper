@@ -11,8 +11,8 @@ enum class InvokeType(val opcode: Int) {
     INTERFACE(Opcodes.INVOKEINTERFACE)
 }
 
-fun InsnListBuilder.invoke(type: InvokeType, descriptor: Descriptor, arguments: (InsnListBuilder.() -> Unit)? = null)
-        = this.invoke(type, descriptor.owner, descriptor.name, descriptor.desc, arguments)
+fun InsnListBuilder.invoke(type: InvokeType, descriptor: Descriptor, arguments: (InsnListBuilder.() -> Unit)? = null) =
+    this.invoke(type, descriptor.owner, descriptor.name, descriptor.desc, arguments)
 
 
 /**
@@ -22,7 +22,13 @@ fun InsnListBuilder.invoke(type: InvokeType, descriptor: Descriptor, arguments: 
  * @param name the name of the method to call.
  * @param desc the method's signature. Ex. (F)Lnet/minecraft/util/Vec3;
  */
-fun InsnListBuilder.invoke(type: InvokeType, owner: String, name: String, desc: String, arguments: (InsnListBuilder.() -> Unit)? = null) {
+fun InsnListBuilder.invoke(
+    type: InvokeType,
+    owner: String,
+    name: String,
+    desc: String,
+    arguments: (InsnListBuilder.() -> Unit)? = null
+) {
     val realName = AsmHelper.remapper.remapMethodName(owner, name, desc)
 
     if (arguments != null) {
@@ -31,13 +37,15 @@ fun InsnListBuilder.invoke(type: InvokeType, owner: String, name: String, desc: 
         insnList.add(insns.build())
     }
 
-    insnList.add(MethodInsnNode(
-        type.opcode,
-        owner,
-        realName,
-        desc,
-        type == InvokeType.INTERFACE
-    ))
+    insnList.add(
+        MethodInsnNode(
+            type.opcode,
+            owner,
+            realName,
+            desc,
+            type == InvokeType.INTERFACE
+        )
+    )
 }
 
 /**

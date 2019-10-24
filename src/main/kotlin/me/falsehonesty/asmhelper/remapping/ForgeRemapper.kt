@@ -6,11 +6,12 @@ import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRema
 class ForgeRemapper : Remapper {
     override fun remapClassName(className: String) = className
 
-    override fun remapMethodName(methodDescriptor: Descriptor): String = FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(
-        methodDescriptor.owner,
-        methodDescriptor.name,
-        methodDescriptor.desc
-    )
+    override fun remapMethodName(methodDescriptor: Descriptor): String =
+        FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(
+            methodDescriptor.owner,
+            methodDescriptor.name,
+            methodDescriptor.desc
+        )
 
     override fun remapFieldName(fieldDescriptor: Descriptor): String = FMLDeobfuscatingRemapper.INSTANCE.mapFieldName(
         fieldDescriptor.owner,

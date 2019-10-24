@@ -82,6 +82,6 @@ abstract class BaseClassTransformer : IClassTransformer {
     }
 
     private fun loadClassResource(name: String): ByteArray {
-        return this::class.java.classLoader.getResourceAsStream(name).readBytes()
+        return this::class.java.classLoader?.getResourceAsStream(name)!!.readBytes()
     }
 }

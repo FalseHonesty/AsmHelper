@@ -15,12 +15,16 @@ object AsmHelper {
     val remapper: Remapper
 
     init {
-        val fmlDeobf = try { Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean } catch (e: Exception) { null }
+        val fmlDeobf = try {
+            Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
+        } catch (e: Exception) {
+            null
+        }
 
         remapper = if (fmlDeobf != null) {
             if (fmlDeobf) DeobfRemapper() else ForgeRemapper()
         } else {
-            val deobf = System.getProperty("asmhelper.deobf", "false").toBoolean()
+            val deobf = System.getProperty("asmhelper.deobf", "false")!!.toBoolean()
 
             if (deobf) DeobfRemapper() else NotchRemapper()
         }

@@ -14,13 +14,15 @@ class FieldWriter(
     private val accessTypes: List<AccessType>
 ) : AsmWriter(className) {
     override fun transform(classNode: ClassNode) {
-        classNode.fields.add(FieldNode(
-            accessTypes.fold(0) { acc, accessType -> acc or accessType.opcode },
-            fieldName,
-            fieldDesc,
-            null,
-            initialValue
-        ))
+        classNode.fields.add(
+            FieldNode(
+                accessTypes.fold(0) { acc, accessType -> acc or accessType.opcode },
+                fieldName,
+                fieldDesc,
+                null,
+                initialValue
+            )
+        )
     }
 
     override fun toString(): String {

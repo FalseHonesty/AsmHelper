@@ -12,17 +12,20 @@ enum class FieldAction(val opcode: Int) {
     PUT_FIELD(Opcodes.PUTFIELD)
 }
 
-fun InsnListBuilder.field(action: FieldAction, descriptor: Descriptor) = this.field(action, descriptor.owner, descriptor.name, descriptor.desc)
+fun InsnListBuilder.field(action: FieldAction, descriptor: Descriptor) =
+    this.field(action, descriptor.owner, descriptor.name, descriptor.desc)
 
 fun InsnListBuilder.field(action: FieldAction, owner: String, name: String, desc: String) {
     val realName = AsmHelper.remapper.remapFieldName(owner, name, desc)
 
-    insnList.add(FieldInsnNode(
-        action.opcode,
-        owner,
-        realName,
-        desc
-    ))
+    insnList.add(
+        FieldInsnNode(
+            action.opcode,
+            owner,
+            realName,
+            desc
+        )
+    )
 }
 
 fun InsnListBuilder.getLocalField(descriptor: Descriptor) {

@@ -17,7 +17,11 @@ class RemoveWriter(
     override fun transform(classNode: ClassNode) {
         classNode.methods
             .find {
-                it.desc == methodDesc && AsmHelper.remapper.remapMethodName(classNode.name, methodName, methodDesc) == it.name
+                it.desc == methodDesc && AsmHelper.remapper.remapMethodName(
+                    classNode.name,
+                    methodName,
+                    methodDesc
+                ) == it.name
             }
             ?.let { removeInsns(it) }
     }

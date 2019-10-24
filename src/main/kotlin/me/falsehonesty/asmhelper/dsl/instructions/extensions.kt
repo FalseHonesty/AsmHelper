@@ -18,7 +18,12 @@ fun InsnListBuilder.getKObjectInstance(objectClassName: String) {
  * Behind the scenes, this produces bytecode that gets the Object instance, and
  * then calls the method.
  */
-fun InsnListBuilder.invokeKOBjectFunction(objectClassName: String, methodName: String, methodDesc: String, arguments: (InsnListBuilder.() -> Unit)? = null) {
+fun InsnListBuilder.invokeKOBjectFunction(
+    objectClassName: String,
+    methodName: String,
+    methodDesc: String,
+    arguments: (InsnListBuilder.() -> Unit)? = null
+) {
     getKObjectInstance(objectClassName)
 
     invoke(InvokeType.VIRTUAL, objectClassName, methodName, methodDesc, arguments)
@@ -71,6 +76,18 @@ fun InsnListBuilder.float(number: Float) {
 }
 
 /**
+ * An abstraction over lconst and ldc, picking the best one
+ * available.
+ */
+fun InsnListBuilder.long(number: Long) {
+    when (number) {
+        0L -> lconst_0()
+        1L -> lconst_1()
+        else -> ldc(number)
+    }
+}
+
+/**
  * Helper for creating an if clause.
  *
  * Jumps into the provided code if and only if the provided condition(s) is/are TRUE.
@@ -98,7 +115,11 @@ inline fun InsnListBuilder.ifClause(vararg conditions: JumpCondition, code: Insn
  *
  * This is simply a helper wrapper around the sequence of calls necessary to create a new object (new, dup, invokespecial)
  */
-inline fun InsnListBuilder.createInstance(className: String, constructorDescription: String, parameters: InsnListBuilder.() -> Unit = {}) {
+inline fun InsnListBuilder.createInstance(
+    className: String,
+    constructorDescription: String,
+    parameters: InsnListBuilder.() -> Unit = {}
+) {
     new(className)
     dup()
 

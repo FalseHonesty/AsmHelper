@@ -57,7 +57,9 @@ class NotchRemapper : Remapper {
 
     override fun remapClassName(className: String) = classMappings[className] ?: className
 
-    override fun remapMethodName(methodDescriptor: Descriptor) = methodMappings[methodDescriptor]?.name ?: methodDescriptor.name
+    override fun remapMethodName(methodDescriptor: Descriptor) =
+        methodMappings[methodDescriptor]?.name ?: methodDescriptor.name
 
-    override fun remapFieldName(fieldDescriptor: Descriptor) = fieldMappings[fieldDescriptor.copy(desc = "")]?.name ?: fieldDescriptor.name
+    override fun remapFieldName(fieldDescriptor: Descriptor) =
+        fieldMappings[fieldDescriptor.copy(desc = "")]?.name ?: fieldDescriptor.name
 }

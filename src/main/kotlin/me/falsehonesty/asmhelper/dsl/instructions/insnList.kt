@@ -144,6 +144,14 @@ class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
         insn(InsnNode(ISUB))
     }
 
+    fun lconst_0() {
+        insn(InsnNode(LCONST_0))
+    }
+
+    fun lconst_1() {
+        insn(InsnNode(LCONST_1))
+    }
+
     fun lstore(value: Int) {
         insn(VarInsnNode(LSTORE, value))
     }

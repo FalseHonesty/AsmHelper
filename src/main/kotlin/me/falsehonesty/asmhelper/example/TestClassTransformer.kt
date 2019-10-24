@@ -29,7 +29,12 @@ class TestClassTransformer : BaseClassTransformer() {
             getLocalField(testMessagesSent)
             invoke(InvokeType.VIRTUAL, "java/lang/StringBuilder", "append", "(I)Ljava/lang/StringBuilder;")
 
-            invoke(InvokeType.VIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;") {
+            invoke(
+                InvokeType.VIRTUAL,
+                "java/lang/StringBuilder",
+                "append",
+                "(Ljava/lang/String;)Ljava/lang/StringBuilder;"
+            ) {
                 argument {
                     ldc(" messages sent so far")
                 }
