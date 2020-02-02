@@ -32,6 +32,12 @@ fun test() {
                 methodReturn()
             }
 
+            array(3, "java/lang/Object") {
+                aadd {
+                    int(3)
+                }
+            }
+
             createInstance("e/e/", "()V")
 
             createInstance("e/e/", "(II)V") {

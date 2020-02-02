@@ -12,6 +12,22 @@ enum class FieldAction(val opcode: Int) {
     PUT_FIELD(Opcodes.PUTFIELD)
 }
 
+fun InsnListBuilder.get_static(owner: String, name: String, desc: String) {
+    field(FieldAction.GET_STATIC, owner, name, desc)
+}
+
+fun InsnListBuilder.get_field(owner: String, name: String, desc: String) {
+    field(FieldAction.GET_FIELD, owner, name, desc)
+}
+
+fun InsnListBuilder.put_static(owner: String, name: String, desc: String) {
+    field(FieldAction.PUT_STATIC, owner, name, desc)
+}
+
+fun InsnListBuilder.put_field(owner: String, name: String, desc: String) {
+    field(FieldAction.PUT_FIELD, owner, name, desc)
+}
+
 fun InsnListBuilder.field(action: FieldAction, descriptor: Descriptor) = this.field(action, descriptor.owner, descriptor.name, descriptor.desc)
 
 fun InsnListBuilder.field(action: FieldAction, owner: String, name: String, desc: String) {
@@ -45,4 +61,26 @@ fun InsnListBuilder.setLocalField(descriptor: Descriptor, newValue: InsnListBuil
     this.newValue()
 
     field(FieldAction.PUT_FIELD, descriptor)
+}
+
+fun InsnListBuilder.getLocalField(owner: String, name: String, desc: String) {
+    aload(0)
+    field(FieldAction.GET_FIELD, owner, name, desc)
+}
+
+fun InsnListBuilder.updateLocalField(owner: String, name: String, desc: String, updater: InsnListBuilder.() -> Unit) {
+    aload(0)
+    getLocalField(owner, name, desc)
+
+    this.updater()
+
+    field(FieldAction.PUT_FIELD, owner, name, desc)
+}
+
+fun InsnListBuilder.setLocalField(owner: String, name: String, desc: String, newValue: InsnListBuilder.() -> Unit) {
+    aload(0)
+
+    this.newValue()
+
+    field(FieldAction.PUT_FIELD, owner, name, desc)
 }
