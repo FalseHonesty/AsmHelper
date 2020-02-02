@@ -14,7 +14,7 @@ enum class InvokeType(val opcode: Int) {
 fun InsnListBuilder.invoke(type: InvokeType, descriptor: Descriptor, arguments: (InsnListBuilder.() -> Unit)? = null) =
     this.invoke(type, descriptor.owner, descriptor.name, descriptor.desc, arguments)
 
-fun InsnListBuilder.invoke_static(
+fun InsnListBuilder.invokeStatic(
     owner: String,
     name: String,
     desc: String,
@@ -23,7 +23,7 @@ fun InsnListBuilder.invoke_static(
     invoke(InvokeType.STATIC, owner, name, desc, arguments)
 }
 
-fun InsnListBuilder.invoke_virtual(
+fun InsnListBuilder.invokeVirtual(
     owner: String,
     name: String,
     desc: String,
@@ -32,7 +32,7 @@ fun InsnListBuilder.invoke_virtual(
     invoke(InvokeType.VIRTUAL, owner, name, desc, arguments)
 }
 
-fun InsnListBuilder.invoke_special(
+fun InsnListBuilder.invokeSpecial(
     owner: String,
     name: String,
     desc: String,
@@ -41,7 +41,7 @@ fun InsnListBuilder.invoke_special(
     invoke(InvokeType.SPECIAL, owner, name, desc, arguments)
 }
 
-fun InsnListBuilder.invoke_interface(
+fun InsnListBuilder.invokeInterface(
     owner: String,
     name: String,
     desc: String,

@@ -12,19 +12,19 @@ enum class FieldAction(val opcode: Int) {
     PUT_FIELD(Opcodes.PUTFIELD)
 }
 
-fun InsnListBuilder.get_static(owner: String, name: String, desc: String) {
+fun InsnListBuilder.getStatic(owner: String, name: String, desc: String) {
     field(FieldAction.GET_STATIC, owner, name, desc)
 }
 
-fun InsnListBuilder.get_field(owner: String, name: String, desc: String) {
+fun InsnListBuilder.getField(owner: String, name: String, desc: String) {
     field(FieldAction.GET_FIELD, owner, name, desc)
 }
 
-fun InsnListBuilder.put_static(owner: String, name: String, desc: String) {
+fun InsnListBuilder.putStatic(owner: String, name: String, desc: String) {
     field(FieldAction.PUT_STATIC, owner, name, desc)
 }
 
-fun InsnListBuilder.put_field(owner: String, name: String, desc: String) {
+fun InsnListBuilder.putField(owner: String, name: String, desc: String) {
     field(FieldAction.PUT_FIELD, owner, name, desc)
 }
 
