@@ -1,5 +1,6 @@
 package me.falsehonesty.asmhelper.dsl
 
+import me.falsehonesty.asmhelper.AsmHelper.logger
 import me.falsehonesty.asmhelper.dsl.instructions.Descriptor
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.AbstractInsnNode
@@ -24,6 +25,15 @@ data class At(val value: InjectionPoint, val before: Boolean = true, val shift: 
             }.let { if (value.ordinal != null) listOf(it[value.ordinal]) else it }
             is InjectionPoint.INVOKE -> method.instructions.iterator().asSequence().toList().filter {
                 val descriptor = value.descriptor
+
+                if (it is MethodInsnNode) {
+                    logger.info("Trying method insn node candidate ${it.owner}.${it.name} ${it.desc}")
+
+                    logger.info("Matches: " +
+                            it.desc == descriptor.desc
+                            && it.name == descriptor.name
+                            && it.owner == descriptor.owner)
+                }
 
                 it is MethodInsnNode
                         && it.desc == descriptor.desc

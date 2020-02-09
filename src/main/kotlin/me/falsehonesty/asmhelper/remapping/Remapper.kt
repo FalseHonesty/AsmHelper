@@ -37,4 +37,14 @@ interface Remapper {
      * Deobf field descriptor --> obf field name
      */
     fun remapFieldName(fieldDescriptor: Descriptor): String
+
+    /**
+     * Maps an invocation instruction's name.
+     */
+    fun mapInvocation(methodName: String): String = methodName
+
+    /**
+     * Maps a field instruction's name.
+     */
+    fun mapFieldAccess(fieldName: String): String = fieldName
 }

@@ -3,6 +3,7 @@ package me.falsehonesty.asmhelper.dsl.writers
 import me.falsehonesty.asmhelper.AsmHelper
 import me.falsehonesty.asmhelper.dsl.AsmWriter
 import me.falsehonesty.asmhelper.dsl.instructions.InsnListBuilder
+import me.falsehonesty.asmhelper.remapping.ForgeRemapper
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
@@ -14,12 +15,16 @@ class OverwriteWriter(
     className: String,
     private val methodName: String,
     private val methodDesc: String,
-    private val insnList: InsnListBuilder.() -> Unit
+    private val insnList: InsnListBuilder.() -> Unit,
+    private val fieldMaps: Map<String, String>,
+    private val methodMaps: Map<String, String>
 ) : AsmWriter(className) {
     override fun transform(classNode: ClassNode) {
+        AsmHelper.fieldMaps = fieldMaps
+        AsmHelper.methodMaps = methodMaps
         classNode.methods
             .find {
-                it.desc == methodDesc && AsmHelper.remapper.remapMethodName(classNode.name, methodName, methodDesc) == it.name
+                it.desc == methodDesc && AsmHelper.remapper.remapMethodName(classNode.name, it.name, it.desc) == methodName
             }
             ?.let { overwriteMethod(it) }
     }
@@ -46,14 +51,15 @@ class OverwriteWriter(
         lateinit var methodName: String
         lateinit var methodDesc: String
         lateinit var insnListData: InsnListBuilder.() -> Unit
+        var fieldMaps = mapOf<String, String>()
+        var methodMaps = mapOf<String, String>()
 
         @Throws(IllegalStateException::class)
         fun build(): AsmWriter {
             return OverwriteWriter(
-                className,
-                methodName,
-                methodDesc,
-                insnListData
+                className, methodName, methodDesc,
+                insnListData,
+                fieldMaps, methodMaps
             )
         }
 

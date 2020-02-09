@@ -64,7 +64,7 @@ fun InsnListBuilder.invoke(
     desc: String,
     arguments: (InsnListBuilder.() -> Unit)? = null
 ) {
-    val realName = AsmHelper.remapper.remapMethodName(owner, name, desc)
+    val realName = AsmHelper.methodMaps.getOrDefault(name, name)
 
     if (arguments != null) {
         val insns = InsnListBuilder(toInjectInto)

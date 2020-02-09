@@ -1,5 +1,6 @@
 package me.falsehonesty.asmhelper
 
+import me.falsehonesty.asmhelper.AsmHelper.logger
 import net.minecraft.launchwrapper.IClassTransformer
 import net.minecraft.launchwrapper.LaunchClassLoader
 import org.apache.logging.log4j.LogManager
@@ -8,7 +9,6 @@ import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.tree.ClassNode
 
 abstract class BaseClassTransformer : IClassTransformer {
-    private val logger = LogManager.getLogger("AsmHelper")
     private var calledSetup = false
 
     private fun setup() {
