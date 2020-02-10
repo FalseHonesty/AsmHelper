@@ -1,5 +1,6 @@
 package me.falsehonesty.asmhelper.dsl
 
+import me.falsehonesty.asmhelper.AsmHelper
 import me.falsehonesty.asmhelper.AsmHelper.logger
 import me.falsehonesty.asmhelper.dsl.instructions.Descriptor
 import org.objectweb.asm.Opcodes
@@ -35,10 +36,12 @@ data class At(val value: InjectionPoint, val before: Boolean = true, val shift: 
                             && it.owner == descriptor.owner)
                 }
 
+                val realName = AsmHelper.remapper.remapMethodName(descriptor.owner, descriptor.name, descriptor.owner)
+
                 it is MethodInsnNode
-                        && it.desc == descriptor.desc
-                        && it.name == descriptor.name
                         && it.owner == descriptor.owner
+                        && realName == descriptor.name
+                        && it.desc == descriptor.desc
             }.let { if (value.ordinal != null) listOf(it[value.ordinal]) else it }
             is InjectionPoint.CUSTOM -> value.finder(method)
         }
