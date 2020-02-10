@@ -25,7 +25,7 @@ class InjectWriter(
         AsmHelper.methodMaps = methodMaps
         classNode.methods
             .find {
-                it.desc == methodDesc && AsmHelper.remapper.remapMethodName(classNode.name, it.name, it.desc) == it.name
+                it.desc == methodDesc && AsmHelper.remapper.remapMethodName(classNode.name, it.name, it.desc) == methodName
             }
             ?.let { injectInsnList(it) } ?: logger.error("No methods found for target $methodName")
     }
