@@ -27,22 +27,11 @@ data class At(val value: InjectionPoint, val before: Boolean = true, val shift: 
             is InjectionPoint.INVOKE -> method.instructions.iterator().asSequence().toList().filter {
                 val descriptor = value.descriptor
 
-                if (it is MethodInsnNode) {
-                    logger.info("Trying method insn node candidate ${it.owner}.${it.name} ${it.desc}")
-
-                    logger.info("Matches: " +
-                            it.desc == descriptor.desc
-                            && it.name == descriptor.name
-                            && it.owner == descriptor.owner)
-                }
-
-                val realName = AsmHelper.remapper.remapMethodName(descriptor.owner, descriptor.name, descriptor.owner)
-
                 it is MethodInsnNode
                         && it.owner == descriptor.owner
-                        && realName == descriptor.name
+                        && AsmHelper.remapper.remapMethodName(it.owner, it.name, it.owner) == descriptor.name
                         && it.desc == descriptor.desc
-            }.let { if (value.ordinal != null) listOf(it[value.ordinal]) else it }
+            }.let { if (value.ordinal != null && value.ordinal < it.size) listOf(it[value.ordinal]) else it }
             is InjectionPoint.CUSTOM -> value.finder(method)
         }
     }
