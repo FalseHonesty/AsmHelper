@@ -24,7 +24,10 @@ class OverwriteWriter(
         AsmHelper.methodMaps = methodMaps
         classNode.methods
             .find {
-                it.desc == methodDesc && AsmHelper.remapper.remapMethodName(classNode.name, it.name, it.desc) == methodName
+                val remapped = AsmHelper.remapper.remapMethodName(classNode.name, it.name, it.desc)
+                val remappedDesc = AsmHelper.remapper.remapDesc(it.desc)
+
+                remappedDesc == methodDesc && (remapped == methodName || methodMaps[remapped] == methodName)
             }
             ?.let { overwriteMethod(it) }
     }

@@ -10,6 +10,7 @@ class TestClassTransformer : BaseClassTransformer() {
         injectCountField()
         injectCountPrint()
         injectDrawSplashScreen()
+        injectEntityPlayer()
 
         world()
     }
@@ -53,6 +54,63 @@ class TestClassTransformer : BaseClassTransformer() {
         fieldName = "testMessagesSent"
         fieldDesc = "I"
         initialValue = 0
+    }
+
+    val CANCELLABLE_EVENT = "com/chattriggers/ctjs/minecraft/listeners/CancellableEvent"
+    val CLIENT_LISTENER = "com/chattriggers/ctjs/minecraft/listeners/ClientListener"
+    val CRASH_REPORT_CATEGORY = "net/minecraft/crash/CrashReportCategory"
+    val EFFECT_RENDERER = "net/minecraft/client/particle/EffectRenderer"
+    val ENTITY = "net/minecraft/entity/Entity"
+    val ENTITY_FX = "net/minecraft/client/particle/EntityFX"
+    val ENTITY_ITEM = "net/minecraft/entity/item/EntityItem"
+    val ENTITY_PLAYER = "net/minecraft/entity/player/EntityPlayer"
+    val FILE = "java/io/File"
+    val FRAME_BUFFER = "net/minecraft/client/shader/Framebuffer"
+    val ICHAT_COMPONENT = "net/minecraft/util/IChatComponent"
+    val INVENTORY_PLAYER = "net/minecraft/entity/player/InventoryPlayer"
+    val ITEM_STACK = "net/minecraft/item/ItemStack"
+    val PACKET = "net/minecraft/network/Packet"
+    val TRIGGER_TYPE = "com/chattriggers/ctjs/triggers/TriggerType"
+
+
+    fun injectEntityPlayer() = inject {
+        className = ENTITY_PLAYER
+        methodName = "dropOneItem"
+        methodDesc = "(Z)L$ENTITY_ITEM;"
+
+        at = At(
+            InjectionPoint.INVOKE(
+                Descriptor(
+                    INVENTORY_PLAYER,
+                    "getCurrentItem",
+                    "()L$ITEM_STACK;"
+                ),
+                ordinal = 0
+            ),
+            shift = 2
+        )
+
+        fieldMaps = mapOf("inventory" to "field_71071_by")
+
+        methodMaps = mapOf(
+            "getCurrentItem" to "func_70448_g",
+            "func_71040_bB" to "dropOneItem",
+            "func_70448_g" to "getCurrentItem"
+        )
+
+        insnList {
+            invokeKOBjectFunction(CLIENT_LISTENER, "onDropItem", "(L$ENTITY_PLAYER;L$ITEM_STACK;)Z") {
+                aload(0)
+
+                getLocalField(ENTITY_PLAYER, "inventory", "L$INVENTORY_PLAYER;")
+                invokeVirtual(INVENTORY_PLAYER, "getCurrentItem", "()L$ITEM_STACK;")
+            }
+
+            ifClause(JumpCondition.FALSE) {
+                aconst_null()
+                areturn()
+            }
+        }
     }
 
     private fun injectSuper() = inject {

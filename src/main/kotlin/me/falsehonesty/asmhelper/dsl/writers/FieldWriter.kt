@@ -24,7 +24,7 @@ class FieldWriter(
     }
 
     override fun toString(): String {
-        return "AsmWriter{className=$className, fieldName=$fieldName}"
+        return "FieldWriter{className=$className, fieldName=$fieldName}"
     }
 
     class Builder {

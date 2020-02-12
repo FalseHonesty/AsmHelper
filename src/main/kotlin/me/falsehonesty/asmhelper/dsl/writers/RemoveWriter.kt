@@ -12,12 +12,16 @@ class RemoveWriter(
     private val methodName: String,
     private val methodDesc: String,
     private val at: At,
-    private val numberToRemove: Int
+    private val numberToRemove: Int,
+    private val methodMaps: Map<String, String>
 ) : AsmWriter(className) {
     override fun transform(classNode: ClassNode) {
         classNode.methods
             .find {
-                it.desc == methodDesc && AsmHelper.remapper.remapMethodName(classNode.name, it.name, it.desc) == methodName
+                val remapped = AsmHelper.remapper.remapMethodName(classNode.name, it.name, it.desc)
+                val remappedDesc = AsmHelper.remapper.remapDesc(it.desc)
+
+                remappedDesc == methodDesc && (remapped == methodName || methodMaps[remapped] == methodName)
             }
             ?.let { removeInsns(it) }
     }
@@ -46,6 +50,7 @@ class RemoveWriter(
         var methodDesc: String? = null
         var at: At? = null
         var numberToRemove: Int = 1
+        var methodMaps = mapOf<String, String>()
 
         @Throws(IllegalStateException::class)
         fun build(): AsmWriter {
@@ -54,7 +59,8 @@ class RemoveWriter(
                 methodName ?: throw IllegalStateException("methodName must NOT be null."),
                 methodDesc ?: throw IllegalStateException("methodDesc must NOT be null."),
                 at ?: throw IllegalStateException("at must NOT be null."),
-                numberToRemove
+                numberToRemove,
+                methodMaps
             )
         }
     }

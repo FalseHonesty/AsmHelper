@@ -13,4 +13,6 @@ class DeobfRemapper : Remapper {
     override fun remapMethodName(methodDescriptor: Descriptor) = methodDescriptor.name
 
     override fun remapFieldName(fieldDescriptor: Descriptor): String = fieldDescriptor.name
+
+    override fun remapDesc(desc: String) = desc
 }

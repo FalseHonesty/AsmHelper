@@ -38,6 +38,8 @@ interface Remapper {
      */
     fun remapFieldName(fieldDescriptor: Descriptor): String
 
+    fun remapDesc(desc: String): String
+
     /**
      * Maps an invocation instruction's name.
      */

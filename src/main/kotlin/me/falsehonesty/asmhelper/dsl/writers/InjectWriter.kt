@@ -23,9 +23,13 @@ class InjectWriter(
     override fun transform(classNode: ClassNode) {
         AsmHelper.fieldMaps = fieldMaps
         AsmHelper.methodMaps = methodMaps
+
         classNode.methods
             .find {
-                it.desc == methodDesc && AsmHelper.remapper.remapMethodName(classNode.name, it.name, it.desc) == methodName
+                val remapped = AsmHelper.remapper.remapMethodName(classNode.name, it.name, it.desc)
+                val remappedDesc = AsmHelper.remapper.remapDesc(it.desc)
+
+                remappedDesc == methodDesc && (remapped == methodName || methodMaps[remapped] == methodName)
             }
             ?.let { injectInsnList(it) } ?: logger.error("No methods found for target $methodName")
     }

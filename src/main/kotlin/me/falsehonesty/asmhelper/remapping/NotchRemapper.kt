@@ -60,4 +60,8 @@ class NotchRemapper : Remapper {
     override fun remapMethodName(methodDescriptor: Descriptor) = methodMappings[methodDescriptor]?.name ?: methodDescriptor.name
 
     override fun remapFieldName(fieldDescriptor: Descriptor) = fieldMappings[fieldDescriptor.copy(desc = "")]?.name ?: fieldDescriptor.name
+
+    override fun remapDesc(desc: String): String {
+        TODO("Not yet implemented")
+    }
 }

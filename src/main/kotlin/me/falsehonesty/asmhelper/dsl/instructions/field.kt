@@ -31,7 +31,7 @@ fun InsnListBuilder.putField(owner: String, name: String, desc: String) {
 fun InsnListBuilder.field(action: FieldAction, descriptor: Descriptor) = this.field(action, descriptor.owner, descriptor.name, descriptor.desc)
 
 fun InsnListBuilder.field(action: FieldAction, owner: String, name: String, desc: String) {
-    val realName = AsmHelper.remapper.remapFieldName(owner, name, desc)
+    val realName = AsmHelper.remapper.mapFieldAccess(name)
 
     insnList.add(FieldInsnNode(
         action.opcode,

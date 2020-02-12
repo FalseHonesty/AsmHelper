@@ -77,7 +77,6 @@ abstract class BaseClassTransformer : IClassTransformer {
             e.printStackTrace()
         }
 
-
         return classWriter.toByteArray()
     }
 

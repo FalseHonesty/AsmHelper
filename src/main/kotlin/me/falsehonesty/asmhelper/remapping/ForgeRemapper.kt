@@ -5,7 +5,12 @@ import me.falsehonesty.asmhelper.dsl.instructions.Descriptor
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper
 
 class ForgeRemapper : Remapper {
-    override fun remapClassName(className: String) = className
+    override fun remapClassName(className: String): String {
+        val mapped = FMLDeobfuscatingRemapper.INSTANCE.map(className)
+        val unmapped = FMLDeobfuscatingRemapper.INSTANCE.unmap(className)
+
+        return mapped
+    }
 
     override fun remapMethodName(methodDescriptor: Descriptor): String = FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(
         methodDescriptor.owner,
@@ -25,5 +30,9 @@ class ForgeRemapper : Remapper {
 
     override fun mapFieldAccess(fieldName: String): String {
         return AsmHelper.fieldMaps.getOrDefault(fieldName, fieldName)
+    }
+
+    override fun remapDesc(desc: String): String {
+        return FMLDeobfuscatingRemapper.INSTANCE.mapMethodDesc(desc)
     }
 }
