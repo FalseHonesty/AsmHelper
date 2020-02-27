@@ -5,7 +5,6 @@ import me.falsehonesty.asmhelper.AsmHelper.logger
 import me.falsehonesty.asmhelper.dsl.AsmWriter
 import me.falsehonesty.asmhelper.dsl.At
 import me.falsehonesty.asmhelper.dsl.instructions.InsnListBuilder
-import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.InsnList
@@ -48,22 +47,22 @@ class InjectWriter(
     }
 
     private fun insertToNode(method: MethodNode, node: AbstractInsnNode, insnList: InsnList) {
-        var newNode = node
+        var target = node
 
         if (at.shift < 0) {
             repeat(-at.shift) {
-                newNode = node.previous
+                target = target.previous
             }
         } else if (at.shift > 0) {
             repeat(at.shift) {
-                newNode = node.next
+                target = target.next
             }
         }
 
         if (at.before) {
-            method.instructions.insertBefore(newNode, insnList)
+            method.instructions.insertBefore(target, insnList)
         } else {
-            method.instructions.insert(newNode, insnList)
+            method.instructions.insert(target, insnList)
         }
     }
 
