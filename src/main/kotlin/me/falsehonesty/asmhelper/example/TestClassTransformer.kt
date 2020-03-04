@@ -31,9 +31,7 @@ class TestClassTransformer : BaseClassTransformer() {
             invoke(InvokeType.VIRTUAL, "java/lang/StringBuilder", "append", "(I)Ljava/lang/StringBuilder;")
 
             invoke(InvokeType.VIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;") {
-                argument {
-                    ldc(" messages sent so far")
-                }
+                ldc(" messages sent so far")
             }
 
             invoke(InvokeType.VIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;")
