@@ -1,6 +1,7 @@
 package me.falsehonesty.asmhelper.dsl.instructions
 
 import me.falsehonesty.asmhelper.AsmHelper
+import org.objectweb.asm.Handle
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.tree.*
@@ -239,7 +240,7 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
      * then calls the method.
      */
     @JvmOverloads
-    fun invokeKOBjectFunction(objectClassName: String, methodName: String, methodDesc: String, arguments: (InsnListBuilder.() -> Unit)? = null) = apply {
+    fun invokeKObjectFunction(objectClassName: String, methodName: String, methodDesc: String, arguments: (InsnListBuilder.() -> Unit)? = null) = apply {
         getKObjectInstance(objectClassName)
 
         invoke(InvokeType.VIRTUAL, objectClassName, methodName, methodDesc, arguments)
@@ -517,6 +518,19 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
                 type == InvokeType.INTERFACE
             )
         )
+    }
+
+    fun indyHandle(type: Int, owner: String, name: String, desc: String): Handle {
+        return Handle(type, owner, name, desc)
+    }
+
+    fun invokeDynamic(name: String, desc: String, handle: Handle, vararg bootstrapArgs: Any?) = apply {
+        insn(InvokeDynamicInsnNode(
+            name,
+            desc,
+            handle,
+            *bootstrapArgs
+        ))
     }
 
     fun astore(): Local {
