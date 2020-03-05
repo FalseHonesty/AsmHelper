@@ -6,6 +6,7 @@ import net.minecraft.launchwrapper.LaunchClassLoader
 import org.apache.logging.log4j.LogManager
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.ClassNode
 
 abstract class BaseClassTransformer : IClassTransformer {
@@ -62,6 +63,9 @@ abstract class BaseClassTransformer : IClassTransformer {
         val classReader = ClassReader(basicClass)
         val classNode = ClassNode()
         classReader.accept(classNode, ClassReader.SKIP_FRAMES)
+
+        // In case we want our classes to support indy & other newer class file features.
+        classNode.version = Opcodes.V1_8
 
         writers.forEach {
             logger.info("Applying AsmWriter {} to class {}", it, transformedName)
