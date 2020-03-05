@@ -5,7 +5,7 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.tree.*
 
-class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
+open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
     val insnList = InsnList()
     var currentLocalIndex = toInjectInto.maxLocals
 
@@ -441,6 +441,7 @@ class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
     fun invoke(type: InvokeType, descriptor: Descriptor, arguments: (InsnListBuilder.() -> Unit)? = null) =
         this.invoke(type, descriptor.owner, descriptor.name, descriptor.desc, arguments)
 
+    @JvmOverloads
     fun invokeStatic(
         owner: String,
         name: String,
@@ -450,6 +451,7 @@ class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
         invoke(InvokeType.STATIC, owner, name, desc, arguments)
     }
 
+    @JvmOverloads
     fun invokeVirtual(
         owner: String,
         name: String,
@@ -459,6 +461,7 @@ class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
         invoke(InvokeType.VIRTUAL, owner, name, desc, arguments)
     }
 
+    @JvmOverloads
     fun invokeSpecial(
         owner: String,
         name: String,
@@ -468,6 +471,7 @@ class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
         invoke(InvokeType.SPECIAL, owner, name, desc, arguments)
     }
 
+    @JvmOverloads
     fun invokeInterface(
         owner: String,
         name: String,
@@ -484,6 +488,7 @@ class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
      * @param name the name of the method to call.
      * @param desc the method's signature. Ex. (F)Lnet/minecraft/util/Vec3;
      */
+    @JvmOverloads
     fun invoke(
         type: InvokeType,
         owner: String,
