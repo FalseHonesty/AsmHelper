@@ -171,6 +171,8 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
 
     fun pop2() = apply { insn(InsnNode(POP2)) }
 
+    fun swap() = apply { insn(InsnNode(SWAP)) }
+
     fun ldc(constant: Any) = apply {
         insn(LdcInsnNode(constant))
     }
