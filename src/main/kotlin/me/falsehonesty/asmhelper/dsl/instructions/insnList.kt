@@ -236,6 +236,7 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
      * Behind the scenes, this produces bytecode that gets the Object instance, and
      * then calls the method.
      */
+    @JvmOverloads
     fun invokeKOBjectFunction(objectClassName: String, methodName: String, methodDesc: String, arguments: (InsnListBuilder.() -> Unit)? = null) = apply {
         getKObjectInstance(objectClassName)
 
@@ -438,6 +439,7 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
         field(FieldAction.PUT_FIELD, owner, name, desc)
     }
 
+    @JvmOverloads
     fun invoke(type: InvokeType, descriptor: Descriptor, arguments: (InsnListBuilder.() -> Unit)? = null) =
         this.invoke(type, descriptor.owner, descriptor.name, descriptor.desc, arguments)
 
