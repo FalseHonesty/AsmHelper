@@ -332,6 +332,7 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
      *
      * This is simply a helper wrapper around the sequence of calls necessary to create a new object (new, dup, invokespecial)
      */
+    @JvmOverloads
     fun createInstance(className: String, constructorDescription: String, parameters: InsnListBuilder.() -> Unit = {}) = apply {
         new(className)
         dup()
