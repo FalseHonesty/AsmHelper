@@ -30,10 +30,12 @@ class RemoveWriter(
         val nodes = at.getTargetedNodes(method)
 
         nodes.forEach { node ->
-            val prev = node.previous
+            var toDelete = node
 
             repeat(numberToRemove) {
-                method.instructions.remove(prev.next ?: return@forEach)
+                val tmpNode = toDelete.next
+                method.instructions.remove(toDelete)
+                toDelete = tmpNode ?: return@forEach
             }
         }
     }
