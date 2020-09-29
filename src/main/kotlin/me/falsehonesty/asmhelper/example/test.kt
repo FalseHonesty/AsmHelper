@@ -12,6 +12,6 @@ import me.falsehonesty.asmhelper.dsl.inject
 //    }
 //}
 
-fun TestClassTransformer.world() {
-
-}
+//fun TestClassTransformer.world() {
+//
+//}
