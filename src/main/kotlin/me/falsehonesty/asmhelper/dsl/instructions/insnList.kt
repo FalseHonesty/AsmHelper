@@ -630,6 +630,107 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
         ))
     }
 
+    /**
+     * Helper for table switch statements.
+     *
+     * This method allows one to easily create table switch statements. Holes are allowed,
+     * however they are of course discouraged and should be kept to a minimum. Cases which
+     * fall into the range but are not present will have their label placed at the default
+     * code block.
+     *
+     * Cases do not have to be ordered correctly, and will have their labels and insn lists
+     * placed in the order they are called by the user. Cases can fallthrough if desired,
+     * and will fallthrough in the order defined.
+     *
+     * An IllegalStateException will be through if there are no cases, or if there are
+     * multiple cases with the same index.
+     */
+    fun tableswitch(builder: SwitchBuilder.() -> Unit) {
+        val tableBuilder = SwitchBuilder().apply(builder)
+        val cases = tableBuilder.cases
+
+        if (cases.isEmpty()) {
+            throw IllegalStateException("tableswitch builder must have at least one case.")
+        }
+
+        if (cases.groupBy { it.index }.any { it.value.size != 1 }) {
+            throw IllegalStateException("tableswitch builder cannot contain duplicate cases.")
+        }
+
+        val min = cases.map { it.index }.min()!!
+        val max = cases.map { it.index }.max()!!
+
+        val labels = (min..max).map { makeLabel() }
+        val defaultLabel = makeLabel()
+        val endLabel = makeLabel()
+
+        insn(TableSwitchInsnNode(min, max, defaultLabel, *labels.toTypedArray()))
+
+        val usedLabels = mutableListOf<LabelNode>()
+
+        cases.forEach { case ->
+            val label = labels[case.index - min]
+            usedLabels.add(label)
+
+            placeLabel(label)
+            apply(case.builder)
+
+            if (!case.fallthrough)
+                jump(JumpCondition.GOTO, endLabel)
+        }
+
+        placeLabel(defaultLabel)
+        // Fill in all of the holes
+        labels.filter { it !in usedLabels }.forEach { placeLabel(it) }
+
+        tableBuilder.defaultCase?.invoke(this)
+        placeLabel(endLabel)
+    }
+
+    /**
+     * Helper for lookup switch statements.
+     *
+     * This method allows one to easily create lookup switch statements. Cases do
+     * not have to be ordered correctly, and will have their labels and insn lists
+     * placed in the order that they are called by the user. Cases can fallthrough
+     * if desired, and will fallthrough in the order defined.
+     *
+     * An IllegalStateException will be through if there are no cases, or if there are
+     * multiple cases with the same index.
+     */
+    fun lookupswitch(builder: SwitchBuilder.() -> Unit) {
+        val tableBuilder = SwitchBuilder().apply(builder)
+        val cases = tableBuilder.cases
+
+        if (cases.isEmpty()) {
+            throw IllegalStateException("lookupswitch builder must have at least one case.")
+        }
+
+        if (cases.groupBy { it.index }.any { it.value.size != 1 }) {
+            throw IllegalStateException("lookupswitch builder cannot contain duplicate cases.")
+        }
+
+        val labels = cases.indices.map { makeLabel() }
+        val defaultLabel = makeLabel()
+        val endLabel = makeLabel()
+
+        insn(LookupSwitchInsnNode(defaultLabel, cases.map { it.index }.toIntArray(), labels.toTypedArray()))
+
+        cases.forEachIndexed { index, case ->
+            val label = labels[index]
+
+            placeLabel(label)
+            apply(case.builder)
+
+            if (!case.fallthrough)
+                jump(JumpCondition.GOTO, endLabel)
+        }
+
+        placeLabel(defaultLabel)
+        tableBuilder.defaultCase?.invoke(this)
+        placeLabel(endLabel)
+    }
+
     fun astore(): Local {
         astore(currentLocalIndex)
 
@@ -718,6 +819,25 @@ class ArrayBuilder(private val insns: InsnListBuilder) {
         insns.code()
         insns.insn(InsnNode(opcode))
     }
+}
+
+class SwitchBuilder {
+    internal val cases = mutableListOf<Case>()
+    internal var defaultCase: (InsnListBuilder.() -> Unit)? = null
+
+    fun case(index: Int, fallthrough: Boolean = false, builder: InsnListBuilder.() -> Unit) {
+        cases.add(Case(index, fallthrough, builder))
+    }
+
+    fun default(builder: InsnListBuilder.() -> Unit) {
+        defaultCase = builder
+    }
+
+    data class Case(
+        val index: Int,
+        val fallthrough: Boolean,
+        val builder: InsnListBuilder.() -> Unit
+    )
 }
 
 class IfElseBuilder(val methodNode: MethodNode) {
