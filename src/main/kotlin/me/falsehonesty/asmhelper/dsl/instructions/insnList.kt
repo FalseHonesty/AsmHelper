@@ -10,37 +10,35 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
     val insnList = InsnList()
     var currentLocalIndex = toInjectInto.maxLocals
 
-    fun aconst_null() = apply {
-        insn(InsnNode(ACONST_NULL))
-    }
+    fun aaload() = apply { insn(InsnNode(AALOAD)) }
 
-    fun aload(index: Int) = apply {
-        insn(VarInsnNode(ALOAD, index))
-    }
+    fun aastore() = apply { insn(InsnNode(AASTORE)) }
 
-    fun areturn() = apply {
-        insn(InsnNode(ARETURN))
-    }
+    fun aconst_null() = apply { insn(InsnNode(ACONST_NULL)) }
 
-    fun arraylength() = apply {
-        insn(InsnNode(ARRAYLENGTH))
-    }
+    fun aload(index: Int) = apply { insn(VarInsnNode(ALOAD, index)) }
 
-    fun astore(index: Int) = apply {
-        insn(VarInsnNode(ASTORE, index))
-    }
+    fun anewarray(className: String) = apply { insn(TypeInsnNode(ANEWARRAY, className)) }
 
-    fun athrow() = apply {
-        insn(InsnNode(ATHROW))
-    }
+    fun areturn() = apply { insn(InsnNode(ARETURN)) }
 
-    fun bipush(value: Int) = apply {
-        insn(IntInsnNode(BIPUSH, value))
-    }
+    fun arraylength() = apply { insn(InsnNode(ARRAYLENGTH)) }
 
-    fun checkcast(type: String) = apply {
-        insn(TypeInsnNode(CHECKCAST, type))
-    }
+    fun astore(index: Int) = apply { insn(VarInsnNode(ASTORE, index)) }
+
+    fun athrow() = apply { insn(InsnNode(ATHROW)) }
+
+    fun baload() = apply { insn(InsnNode(BALOAD)) }
+
+    fun bastore() = apply { insn(InsnNode(BALOAD)) }
+
+    fun bipush(value: Int) = apply { insn(IntInsnNode(BIPUSH, value)) }
+
+    fun caload() = apply { insn(InsnNode(CALOAD)) }
+
+    fun castore() = apply { insn(InsnNode(CALOAD)) }
+
+    fun checkcast(type: String) = apply { insn(TypeInsnNode(CHECKCAST, type)) }
 
     fun d2f() = apply { insn(InsnNode(D2F)) }
 
@@ -49,6 +47,10 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
     fun d2l() = apply { insn(InsnNode(D2L)) }
 
     fun dadd() = apply { insn(InsnNode(DADD)) }
+
+    fun daload() = apply { insn(InsnNode(DALOAD)) }
+
+    fun dastore() = apply { insn(InsnNode(DALOAD)) }
 
     fun dcmpg() = apply { insn(InsnNode(DCMPG)) }
 
@@ -74,9 +76,7 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
 
     fun dsub() = apply { insn(InsnNode(DSUB)) }
 
-    fun dup() = apply {
-        insn(InsnNode(DUP))
-    }
+    fun dup() = apply { insn(InsnNode(DUP)) }
 
     fun dup_x1() = apply { insn(InsnNode(DUP_X1)) }
 
@@ -95,6 +95,10 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
     fun f2l() = apply { insn(InsnNode(F2L)) }
 
     fun fadd() = apply { insn(InsnNode(FADD)) }
+
+    fun faload() = apply { insn(InsnNode(FALOAD)) }
+
+    fun fastore() = apply { insn(InsnNode(FALOAD)) }
 
     fun fcmpg() = apply { insn(InsnNode(FCMPG)) }
 
@@ -122,65 +126,163 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
 
     fun fsub() = apply { insn(InsnNode(FSUB)) }
 
-    fun iload(value: Int) = apply {
-        insn(VarInsnNode(ILOAD, value))
-    }
+    fun i2b() = apply { insn(InsnNode(I2B)) }
 
-    fun istore(value: Int) = apply {
-        insn(VarInsnNode(ISTORE, value))
-    }
+    fun i2c() = apply { insn(InsnNode(I2C)) }
 
-    fun iadd() = apply {
-        insn(InsnNode(IADD))
-    }
+    fun i2d() = apply { insn(InsnNode(I2D)) }
 
-    fun ireturn() = apply {
-        insn(InsnNode(IRETURN))
-    }
+    fun i2f() = apply { insn(InsnNode(I2F)) }
 
-    fun sipush(value: Int) = apply {
-        insn(IntInsnNode(SIPUSH, value))
-    }
+    fun i2l() = apply { insn(InsnNode(I2L)) }
 
-    fun isub() = apply {
-        insn(InsnNode(ISUB))
-    }
+    fun i2s() = apply { insn(InsnNode(I2S)) }
 
-    fun lconst_0() = apply {
-        insn(InsnNode(LCONST_0))
-    }
+    fun iadd() = apply { insn(InsnNode(IADD)) }
 
-    fun lconst_1() = apply {
-        insn(InsnNode(LCONST_1))
-    }
+    fun iaload() = apply { insn(InsnNode(IALOAD)) }
 
-    fun lstore(value: Int) = apply {
-        insn(VarInsnNode(LSTORE, value))
-    }
+    fun iand() = apply { insn(InsnNode(IAND)) }
 
-    fun lload(value: Int) = apply {
-        insn(VarInsnNode(LLOAD, value))
-    }
+    fun iastore() = apply { insn(InsnNode(IASTORE)) }
+
+    fun iconst_m1() = apply { insn(InsnNode(ICONST_M1)) }
+
+    fun iconst_0() = apply { insn(InsnNode(ICONST_0)) }
+
+    fun iconst_1() = apply { insn(InsnNode(ICONST_1)) }
+
+    fun iconst_2() = apply { insn(InsnNode(ICONST_2)) }
+
+    fun iconst_3() = apply { insn(InsnNode(ICONST_3)) }
+
+    fun iconst_4() = apply { insn(InsnNode(ICONST_4)) }
+
+    fun iconst_5() = apply { insn(InsnNode(ICONST_5)) }
+
+    fun idiv() = apply { insn(InsnNode(IDIV)) }
+
+    fun iinc() = apply { insn(InsnNode(IINC)) }
+
+    fun iload(value: Int) = apply { insn(VarInsnNode(ILOAD, value)) }
+
+    fun imul() = apply { insn(InsnNode(IMUL)) }
+
+    fun ineg() = apply { insn(InsnNode(INEG)) }
 
     fun instanceof(clazzName: String) = apply { insn(TypeInsnNode(INSTANCEOF, clazzName)) }
 
-    fun new(className: String) = apply {
-        insn(TypeInsnNode(NEW, className))
+    fun ior() = apply { insn(InsnNode(IOR)) }
+
+    fun irem() = apply { insn(InsnNode(IREM)) }
+
+    fun ireturn() = apply { insn(InsnNode(IRETURN)) }
+
+    fun ishl() = apply { insn(InsnNode(ISHL)) }
+
+    fun ishr() = apply { insn(InsnNode(ISHR)) }
+
+    fun istore(value: Int) = apply { insn(VarInsnNode(ISTORE, value)) }
+
+    fun isub() = apply { insn(InsnNode(ISUB)) }
+
+    fun iushr() = apply { insn(InsnNode(IUSHR)) }
+
+    fun ixor() = apply { insn(InsnNode(IXOR)) }
+
+    fun l2d() = apply { insn(InsnNode(L2D)) }
+
+    fun l2f() = apply { insn(InsnNode(L2F)) }
+
+    fun l2i() = apply { insn(InsnNode(L2I)) }
+
+    fun ladd() = apply { insn(InsnNode(LADD)) }
+
+    fun laload() = apply { insn(InsnNode(LALOAD)) }
+
+    fun land() = apply { insn(InsnNode(LAND)) }
+
+    fun lastore() = apply { insn(InsnNode(LASTORE)) }
+
+    fun lcmp() = apply { insn(InsnNode(LCMP)) }
+
+    fun lconst_0() = apply { insn(InsnNode(LCONST_0)) }
+
+    fun lconst_1() = apply { insn(InsnNode(LCONST_1)) }
+
+    fun ldc(constant: Any) = apply { insn(LdcInsnNode(constant)) }
+
+    fun ldiv() = apply { insn(InsnNode(LDIV))}
+
+    fun lload(value: Int) = apply { insn(VarInsnNode(LLOAD, value)) }
+
+    fun lmul() = apply { insn(InsnNode(LMUL)) }
+
+    fun lneg() = apply { insn(InsnNode(LNEG)) }
+
+    fun lor() = apply { insn(InsnNode(LOR)) }
+
+    fun lrem() = apply { insn(InsnNode(LREM)) }
+
+    fun lreturn() = apply { insn(InsnNode(LRETURN)) }
+
+    fun lshl() = apply { insn(InsnNode(LSHL)) }
+
+    fun lshr() = apply { insn(InsnNode(LSHR)) }
+
+    fun lstore(value: Int) = apply { insn(VarInsnNode(LSTORE, value)) }
+
+    fun lsub() = apply { insn(InsnNode(LSUB)) }
+
+    fun lushr() = apply { insn(InsnNode(LUSHR)) }
+
+    fun lxor() = apply { insn(InsnNode(LXOR)) }
+
+    fun monitorenter() = apply { insn(InsnNode(MONITORENTER))}
+
+    fun monitorexit() = apply { insn(InsnNode(MONITOREXIT)) }
+
+    fun multianewarray(descriptor: String, dimensions: Int) = apply {
+        insn(MultiANewArrayInsnNode(descriptor, dimensions))
     }
+
+    fun new(className: String) = apply { insn(TypeInsnNode(NEW, className)) }
+
+    fun newarray(type: Int, length: Int? = null) = apply {
+        if (length != null)
+            ldc(length)
+        insn(IntInsnNode(NEWARRAY, type))
+    }
+
+    fun bnewarray(length: Int? = null) = apply { newarray(T_BYTE, length) }
+
+    fun cnewarray(length: Int? = null) = apply { newarray(T_CHAR, length) }
+
+    fun dnewarray(length: Int? = null) = apply { newarray(T_DOUBLE, length) }
+
+    fun fnewarray(length: Int? = null) = apply { newarray(T_FLOAT, length) }
+
+    fun inewarray(length: Int? = null) = apply { newarray(T_INT, length) }
+
+    fun lnewarray(length: Int? = null) = apply { newarray(T_LONG, length) }
+
+    fun snewarray(length: Int? = null) = apply { newarray(T_SHORT, length) }
+
+    fun znewarray(length: Int? = null) = apply { newarray(T_BOOLEAN, length) }
 
     fun pop() = apply { insn(InsnNode(POP)) }
 
     fun pop2() = apply { insn(InsnNode(POP2)) }
 
+    fun methodReturn() = apply { insn(InsnNode(RETURN)) }
+
+    fun saload() = apply { insn(InsnNode(SALOAD)) }
+
+    fun sastore() = apply { insn(InsnNode(SASTORE)) }
+
+    fun sipush(value: Int) = apply { insn(IntInsnNode(SIPUSH, value)) }
+
     fun swap() = apply { insn(InsnNode(SWAP)) }
-
-    fun ldc(constant: Any) = apply {
-        insn(LdcInsnNode(constant))
-    }
-
-    fun methodReturn() = apply {
-        insn(InsnNode(RETURN))
-    }
 
     /**
      * Creates a new label, but does not place it anywhere in the bytecode,
@@ -191,32 +293,11 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
     /**
      * Places a previously created label.
      */
-    fun placeLabel(label: LabelNode) = apply {
-        insn(label)
-    }
+    fun placeLabel(label: LabelNode) = apply { insn(label) }
 
     fun jump(condition: JumpCondition, label: LabelNode) = apply {
         insn(JumpInsnNode(condition.opcode, label))
     }
-
-    fun anewarray(className: String) = apply {
-        insn(TypeInsnNode(ANEWARRAY, className))
-    }
-
-    fun aaload() = apply { insn(InsnNode(AALOAD)) }
-    fun aastore() = apply { insn(InsnNode(AASTORE)) }
-
-    fun baload() = apply { insn(InsnNode(BALOAD)) }
-    fun bastore() = apply { insn(InsnNode(BALOAD)) }
-
-    fun caload() = apply { insn(InsnNode(BALOAD)) }
-    fun castore() = apply { insn(InsnNode(BALOAD)) }
-
-    fun daload() = apply { insn(InsnNode(BALOAD)) }
-    fun dastore() = apply { insn(InsnNode(BALOAD)) }
-
-    fun faload() = apply { insn(InsnNode(BALOAD)) }
-    fun fastore() = apply { insn(InsnNode(BALOAD)) }
 
     fun array(size: Int, className: String, code: ArrayBuilder.() -> Unit) = apply {
         int(size)
@@ -252,13 +333,13 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
      */
     fun int(number: Int) = apply {
         when (number) {
-            -1 -> insn(InsnNode(Opcodes.ICONST_M1))
-            0 -> insn(InsnNode(Opcodes.ICONST_0))
-            1 -> insn(InsnNode(Opcodes.ICONST_1))
-            2 -> insn(InsnNode(Opcodes.ICONST_2))
-            3 -> insn(InsnNode(Opcodes.ICONST_3))
-            4 -> insn(InsnNode(Opcodes.ICONST_4))
-            5 -> insn(InsnNode(Opcodes.ICONST_5))
+            -1 -> iconst_m1()
+            0 -> iconst_0()
+            1 -> iconst_1()
+            2 -> iconst_2()
+            3 -> iconst_3()
+            4 -> iconst_4()
+            5 -> iconst_5()
             in 6..127 -> bipush(number)
             in -127..-2 -> bipush(number)
             in 128..32768 -> sipush(number)
