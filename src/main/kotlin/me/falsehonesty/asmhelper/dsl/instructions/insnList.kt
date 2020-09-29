@@ -386,6 +386,21 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
     }
 
     /**
+     * Helper for a synchronized block. Synchronizes on the object at the top of the stack
+     * by entering its monitor at the beginning and exiting its monitor at the end.
+     * Note that you do not have to maintain the stack height inside the code block for
+     * this utility to work, as it uses astore/aload.
+     */
+    fun synchronized(code: InsnListBuilder.() -> Unit) = apply {
+        dup()
+        val syncObj = astore()
+        monitorenter()
+        this.code()
+        load(syncObj)
+        monitorexit()
+    }
+
+    /**
      * Helper for creating an if clause.
      *
      * Jumps into the provided code if and only if the provided condition(s) is/are TRUE.
