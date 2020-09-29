@@ -11,6 +11,6 @@ import me.falsehonesty.asmhelper.dsl.InjectionPoint
 //    }
 //}
 
-fun TestClassTransformer.world() {
-
-}
+//fun TestClassTransformer.world() {
+//
+//}
