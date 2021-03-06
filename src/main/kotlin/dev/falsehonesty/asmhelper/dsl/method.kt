@@ -2,10 +2,8 @@
 package dev.falsehonesty.asmhelper.dsl
 
 import dev.falsehonesty.asmhelper.AsmHelper
-import dev.falsehonesty.asmhelper.dsl.writers.FieldWriter
-import dev.falsehonesty.asmhelper.dsl.writers.InjectWriter
-import dev.falsehonesty.asmhelper.dsl.writers.OverwriteWriter
-import dev.falsehonesty.asmhelper.dsl.writers.RemoveWriter
+import dev.falsehonesty.asmhelper.dsl.writers.*
+import org.objectweb.asm.tree.ClassNode
 
 /**
  * Injects instructions into the specified place.
@@ -57,4 +55,14 @@ fun remove(config: RemoveWriter.Builder.() -> Unit) {
     writer.config()
 
     AsmHelper.asmWriters.add(writer.build())
+}
+
+/**
+ * Allows for general usage and modification of a ClassNode.
+ *
+ * There are no guarantees on the nature of the modification that will take place, it is up
+ * to the caller.
+ */
+fun modify(className: String, modifyAction: (ClassNode) -> Unit) {
+    AsmHelper.asmWriters.add(GeneralModificationWriter(className, modifyAction))
 }
