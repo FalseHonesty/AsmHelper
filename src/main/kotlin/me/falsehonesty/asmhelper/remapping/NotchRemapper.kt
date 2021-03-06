@@ -15,42 +15,46 @@ class NotchRemapper : Remapper {
         val mappings = javaClass.getResource("/mcp-notch.srg").readText()
 
         mappings.split("\n").forEach {
-            if (it.startsWith("CL: ")) {
-                val (deobf, obf) = it.substring(4).split(" ")
+            when {
+                it.startsWith("CL: ") -> {
+                    val (deobf, obf) = it.substring(4).split(" ")
 
-                classMappings[deobf] = obf
-            } else if (it.startsWith("FD: ")) {
-                val (deobf, obf) = it.substring(4).split(" ")
+                    classMappings[deobf] = obf
+                }
+                it.startsWith("FD: ") -> {
+                    val (deobf, obf) = it.substring(4).split(" ")
 
-                val deobfDescriptor = Descriptor(
-                    deobf.substring(0, deobf.lastIndexOf("/")),
-                    deobf.substring(deobf.lastIndexOf("/") + 1),
-                    ""
-                )
+                    val deobfDescriptor = Descriptor(
+                        deobf.substring(0, deobf.lastIndexOf("/")),
+                        deobf.substring(deobf.lastIndexOf("/") + 1),
+                        ""
+                    )
 
-                val obfDescriptor = Descriptor(
-                    obf.substring(0, obf.lastIndexOf("/")),
-                    obf.substring(obf.lastIndexOf("/") + 1),
-                    ""
-                )
+                    val obfDescriptor = Descriptor(
+                        obf.substring(0, obf.lastIndexOf("/")),
+                        obf.substring(obf.lastIndexOf("/") + 1),
+                        ""
+                    )
 
-                fieldMappings[deobfDescriptor] = obfDescriptor
-            } else if (it.startsWith("MD: ")) {
-                val (deobf, deobfDesc, obf, obfDesc) = it.substring(4).split(" ")
+                    fieldMappings[deobfDescriptor] = obfDescriptor
+                }
+                it.startsWith("MD: ") -> {
+                    val (deobf, deobfDesc, obf, obfDesc) = it.substring(4).split(" ")
 
-                val deobfDescriptor = Descriptor(
-                    deobf.substring(0, deobf.lastIndexOf("/")),
-                    deobf.substring(deobf.lastIndexOf("/") + 1),
-                    deobfDesc
-                )
+                    val deobfDescriptor = Descriptor(
+                        deobf.substring(0, deobf.lastIndexOf("/")),
+                        deobf.substring(deobf.lastIndexOf("/") + 1),
+                        deobfDesc
+                    )
 
-                val obfDescriptor = Descriptor(
-                    obf.substring(0, obf.lastIndexOf("/")),
-                    obf.substring(obf.lastIndexOf("/") + 1),
-                    obfDesc
-                )
+                    val obfDescriptor = Descriptor(
+                        obf.substring(0, obf.lastIndexOf("/")),
+                        obf.substring(obf.lastIndexOf("/") + 1),
+                        obfDesc
+                    )
 
-                methodMappings[deobfDescriptor] = obfDescriptor
+                    methodMappings[deobfDescriptor] = obfDescriptor
+                }
             }
         }
     }

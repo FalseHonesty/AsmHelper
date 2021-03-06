@@ -3,12 +3,9 @@ package me.falsehonesty.asmhelper.dsl.writers
 import me.falsehonesty.asmhelper.AsmHelper
 import me.falsehonesty.asmhelper.dsl.AsmWriter
 import me.falsehonesty.asmhelper.dsl.instructions.InsnListBuilder
-import me.falsehonesty.asmhelper.remapping.ForgeRemapper
-import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.ClassNode
-import org.objectweb.asm.tree.InsnList
 import org.objectweb.asm.tree.MethodNode
 
 class OverwriteWriter(

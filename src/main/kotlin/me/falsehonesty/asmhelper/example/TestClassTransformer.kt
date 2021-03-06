@@ -6,13 +6,30 @@ import me.falsehonesty.asmhelper.dsl.instructions.*
 import me.falsehonesty.asmhelper.dsl.writers.AccessType
 
 class TestClassTransformer : BaseClassTransformer() {
-    override fun makeTransformers() {
-        injectCountField()
-        injectCountPrint()
-        injectDrawSplashScreen()
-        injectEntityPlayer()
+    val CANCELLABLE_EVENT = "com/chattriggers/ctjs/minecraft/listeners/CancellableEvent"
+    val CLIENT_LISTENER = "com/chattriggers/ctjs/minecraft/listeners/ClientListener"
+    val CRASH_REPORT_CATEGORY = "net/minecraft/crash/CrashReportCategory"
+    val EFFECT_RENDERER = "net/minecraft/client/particle/EffectRenderer"
+    val ENTITY = "net/minecraft/entity/Entity"
+    val ENTITY_FX = "net/minecraft/client/particle/EntityFX"
+    val ENTITY_ITEM = "net/minecraft/entity/item/EntityItem"
+    val ENTITY_PLAYER = "net/minecraft/entity/player/EntityPlayer"
+    val FILE = "java/io/File"
+    val FRAME_BUFFER = "net/minecraft/client/shader/Framebuffer"
+    val ICHAT_COMPONENT = "net/minecraft/util/IChatComponent"
+    val INVENTORY_PLAYER = "net/minecraft/entity/player/InventoryPlayer"
+    val ITEM_STACK = "net/minecraft/item/ItemStack"
+    val PACKET = "net/minecraft/network/Packet"
+    val TRIGGER_TYPE = "com/chattriggers/ctjs/triggers/TriggerType"
 
-        world()
+    override fun makeTransformers() {
+//        injectCountField()
+//        injectCountPrint()
+//        injectDrawSplashScreen()
+//        injectEntityPlayer()
+        injectPrintInGameLoop()
+
+//        world()
     }
 
     private fun injectCountPrint() = overwrite {
@@ -54,23 +71,6 @@ class TestClassTransformer : BaseClassTransformer() {
         initialValue = 0
     }
 
-    val CANCELLABLE_EVENT = "com/chattriggers/ctjs/minecraft/listeners/CancellableEvent"
-    val CLIENT_LISTENER = "com/chattriggers/ctjs/minecraft/listeners/ClientListener"
-    val CRASH_REPORT_CATEGORY = "net/minecraft/crash/CrashReportCategory"
-    val EFFECT_RENDERER = "net/minecraft/client/particle/EffectRenderer"
-    val ENTITY = "net/minecraft/entity/Entity"
-    val ENTITY_FX = "net/minecraft/client/particle/EntityFX"
-    val ENTITY_ITEM = "net/minecraft/entity/item/EntityItem"
-    val ENTITY_PLAYER = "net/minecraft/entity/player/EntityPlayer"
-    val FILE = "java/io/File"
-    val FRAME_BUFFER = "net/minecraft/client/shader/Framebuffer"
-    val ICHAT_COMPONENT = "net/minecraft/util/IChatComponent"
-    val INVENTORY_PLAYER = "net/minecraft/entity/player/InventoryPlayer"
-    val ITEM_STACK = "net/minecraft/item/ItemStack"
-    val PACKET = "net/minecraft/network/Packet"
-    val TRIGGER_TYPE = "com/chattriggers/ctjs/triggers/TriggerType"
-
-
     fun injectEntityPlayer() = inject {
         className = ENTITY_PLAYER
         methodName = "dropOneItem"
@@ -97,7 +97,7 @@ class TestClassTransformer : BaseClassTransformer() {
         )
 
         insnList {
-            invokeKOBjectFunction(CLIENT_LISTENER, "onDropItem", "(L$ENTITY_PLAYER;L$ITEM_STACK;)Z") {
+            invokeKObjectFunction(CLIENT_LISTENER, "onDropItem", "(L$ENTITY_PLAYER;L$ITEM_STACK;)Z") {
                 aload(0)
 
                 getLocalField(ENTITY_PLAYER, "inventory", "L$INVENTORY_PLAYER;")
@@ -140,13 +140,24 @@ class TestClassTransformer : BaseClassTransformer() {
         insnList {
             placeLabel(makeLabel())
 
-            invokeKOBjectFunction(
+            invokeKObjectFunction(
                 "me/falsehonesty/asmhelper/example/TestHelper",
                 "drawSplash",
                 "()V"
             )
 
             methodReturn()
+        }
+    }
+
+    private fun injectPrintInGameLoop() = inject {
+        className = "net.minecraft.client.Minecraft"
+        methodName = "runGameLoop"
+        methodDesc = "(Z)V"
+        at = At(InjectionPoint.HEAD)
+
+        insnList {
+            invokeKObjectFunction("me/falsehonesty/asmhelper/example/TestHelper", "printMessage", "()V")
         }
     }
 }
