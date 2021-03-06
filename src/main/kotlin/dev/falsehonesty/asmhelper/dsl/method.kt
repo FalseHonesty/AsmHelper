@@ -1,0 +1,71 @@
+@file:JvmName("Method")
+package dev.falsehonesty.asmhelper.dsl
+
+import dev.falsehonesty.asmhelper.dsl.writers.GeneralModificationWriter
+import dev.falsehonesty.asmhelper.AsmHelper
+import dev.falsehonesty.asmhelper.dsl.writers.FieldWriter
+import dev.falsehonesty.asmhelper.dsl.writers.InjectWriter
+import dev.falsehonesty.asmhelper.dsl.writers.OverwriteWriter
+import dev.falsehonesty.asmhelper.dsl.writers.RemoveWriter
+
+/**
+ * Injects instructions into the specified place.
+ *
+ * This is a purely additive action and will not remove any existing bytecode.
+ */
+fun inject(config: InjectWriter.Builder.() -> Unit) {
+    val writer = InjectWriter.Builder()
+
+    writer.config()
+
+    AsmHelper.asmWriters.add(writer.build())
+}
+
+/**
+ * Removes all existing instructions and replaces them with the specified bytecode.
+ *
+ * This IS a destructive action.
+ */
+fun overwrite(config: OverwriteWriter.Builder.() -> Unit) {
+    val writer = OverwriteWriter.Builder()
+
+    writer.config()
+
+    AsmHelper.asmWriters.add(writer.build())
+}
+
+/**
+ * Adds the specified field into the transformed class.
+ *
+ * This instruction will not harm any existing code.
+ */
+fun applyField(config: FieldWriter.Builder.() -> Unit) {
+    val writer = FieldWriter.Builder()
+
+    writer.config()
+
+    AsmHelper.asmWriters.add(writer.build())
+}
+
+/**
+ * Removes a specified number of instructions in a method.
+ *
+ * This IS a destructive operation (obviously).
+ */
+fun remove(config: RemoveWriter.Builder.() -> Unit) {
+    val writer = RemoveWriter.Builder()
+
+    writer.config()
+
+    AsmHelper.asmWriters.add(writer.build())
+}
+
+/**
+ * Allows for general usage and modification of a ClassNode.
+ *
+ * There are no guarantees on the nature of the modification that will take place, it is up
+ * to the caller.
+ */
+fun modify(className: String, modifyAction: GeneralModificationWriter.GeneralModificationDSL.() -> Unit) {
+    AsmHelper.asmWriters.add(GeneralModificationWriter(className, modifyAction))
+}

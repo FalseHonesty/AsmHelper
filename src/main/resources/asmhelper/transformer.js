@@ -1,6 +1,6 @@
 // For 1.15.2+
 function initializeCoreMod() {
-    var asmHelper = Java.type("me.falsehonesty.asmhelper.AsmHelper")
+    var asmHelper = Java.type("dev.falsehonesty.asmhelper.AsmHelper")
 
     return {
         asmhelper: {

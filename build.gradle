@@ -86,7 +86,7 @@ preprocess {
 }
 
 version = "1.1"
-group = "me.falsehonesty.asmhelper"
+group = "dev.falsehonesty.asmhelper"
 archivesBaseName = "AsmHelper" + project.name
 
 sourceCompatibility = targetCompatibility = 1.8
@@ -118,7 +118,7 @@ if (FABRIC) {
             }
         } else {
             if (mcVersion <= 11202) {
-                coreMod = "me.falsehonesty.asmhelper.coremod.AsmHelperLoadingPlugin"
+                coreMod = "dev.falsehonesty.asmhelper.coremod.AsmHelperLoadingPlugin"
             }
             runDir = "run"
         }
@@ -254,8 +254,8 @@ configurations {
 sourceSets {
     main {
         kotlin {
-//            exclude 'me/falsehonesty/asmhelper/example/**'
-            exclude 'me/falsehonesty/asmhelpermod/**'
+//            exclude 'dev/falsehonesty/asmhelper/example/**'
+            exclude 'dev/falsehonesty/asmhelpermod/**'
         }
     }
 }
