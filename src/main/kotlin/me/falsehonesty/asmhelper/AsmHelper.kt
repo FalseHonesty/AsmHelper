@@ -8,9 +8,11 @@ import me.falsehonesty.asmhelper.remapping.Remapper
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.lang.Exception
+import java.util.ServiceLoader
 
 //#if MC<=11202
 import net.minecraft.launchwrapper.Launch
+
 //#else
 //$$ import cpw.mods.modlauncher.Launcher
 //$$ import net.minecraftforge.fml.loading.FMLClientLaunchProvider
@@ -29,6 +31,8 @@ object AsmHelper {
 
     internal var fieldMaps = mapOf<String, String>()
     internal var methodMaps = mapOf<String, String>()
+
+    internal val serviceLoader = ServiceLoader.load(ClassTransformationService::class.java)
 
     init {
         val fmlDeobf = try {

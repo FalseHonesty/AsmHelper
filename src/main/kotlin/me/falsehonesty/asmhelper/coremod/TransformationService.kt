@@ -4,6 +4,7 @@ package me.falsehonesty.asmhelper.coremod
 //$$ import cpw.mods.modlauncher.api.IEnvironment
 //$$ import cpw.mods.modlauncher.api.ITransformationService
 //$$ import cpw.mods.modlauncher.api.ITransformer
+//$$ import me.falsehonesty.asmhelper.AsmHelper
 //$$ import me.falsehonesty.asmhelper.BaseClassTransformer
 //$$ import net.minecraftforge.coremod.CoreModEngine
 //$$ import net.minecraftforge.coremod.CoreModProvider
@@ -33,18 +34,20 @@ package me.falsehonesty.asmhelper.coremod
 //$$     }
 //$$
 //$$     override fun beginScanning(environment: IEnvironment) {
-//$$         System.getProperty("asmhelper.transformers")?.split(',')?.map(String::trim)?.forEach {
-//$$             val clazz = Class.forName(it.replace('/', '.'))
-//$$             if (!BaseClassTransformer::class.java.isAssignableFrom(clazz))
-//$$                 throw IllegalStateException("ASM transformer $clazz does not inherit from BaseClassTransformer")
+//$$         for (service in AsmHelper.serviceLoader) {
+//$$             for (transformer in service.transformerClasses()) {
+//$$                 val clazz = Class.forName(transformer.trim().replace('/', '.'))
+//$$                 if (!BaseClassTransformer::class.java.isAssignableFrom(clazz))
+//$$                     throw IllegalStateException("ASM transformer $clazz does not inherit from BaseClassTransformer")
 //$$
-//$$             val instance = try {
-//$$                 clazz.newInstance() as BaseClassTransformer
-//$$             } catch (e: InstantiationException) {
-//$$                 throw IllegalStateException("Unable to construct instance of $clazz", e)
+//$$                 val instance = try {
+//$$                     clazz.newInstance() as BaseClassTransformer
+//$$                 } catch (e: InstantiationException) {
+//$$                     throw IllegalStateException("Unable to construct instance of $clazz", e)
+//$$                 }
+//$$
+//$$                 instance.makeTransformers()
 //$$             }
-//$$
-//$$             instance.makeTransformers()
 //$$         }
 //$$     }
 //$$

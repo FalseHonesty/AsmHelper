@@ -1,11 +1,12 @@
 package me.falsehonesty.asmhelper.coremod
 
 //#if MC<=11202
+import me.falsehonesty.asmhelper.AsmHelper
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin
 
 class AsmHelperLoadingPlugin : IFMLLoadingPlugin {
     override fun getASMTransformerClass(): Array<String> {
-        return arrayOf("me.falsehonesty.asmhelper.example.TestClassTransformer")
+        return AsmHelper.serviceLoader.flatMap { it.transformerClasses() }.toTypedArray()
     }
 
     override fun getModContainerClass(): String? = null
