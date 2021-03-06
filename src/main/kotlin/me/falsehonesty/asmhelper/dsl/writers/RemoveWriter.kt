@@ -3,7 +3,6 @@ package me.falsehonesty.asmhelper.dsl.writers
 import me.falsehonesty.asmhelper.AsmHelper
 import me.falsehonesty.asmhelper.dsl.AsmWriter
 import me.falsehonesty.asmhelper.dsl.At
-import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodNode
 
@@ -44,6 +43,7 @@ class RemoveWriter(
         return "RemoveWriter{className=$className,at=$at,numToRem=$numberToRemove}"
     }
 
+    @Suppress("MemberVisibilityCanBePrivate")
     class Builder {
         var className: String? = null
         var methodName: String? = null

@@ -30,7 +30,6 @@ buildscript {
         maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         if (fabric) {
             classpath 'fabric-loom:fabric-loom.gradle.plugin:0.4-SNAPSHOT'
         } else if (mcVersion >= 11400) {
@@ -52,6 +51,20 @@ buildscript {
 
 apply plugin: "kotlin"
 
+repositories {
+    mavenCentral()
+    jcenter()
+    maven {
+        name = "kryonet"
+        url = "http://clojars.org/repo/"
+    }
+    maven {
+        url 'https://repository.apache.org/content/repositories/releases/org/apache/xmlgraphics/'
+    }
+    maven { url 'https://jitpack.io' }
+    maven { url "https://repo.sk1er.club/repository/maven-public" }
+}
+
 def FG3 = !fabric && mcVersion >= 11400
 def FABRIC = fabric
 
@@ -64,6 +77,7 @@ if (FABRIC) {
 }
 
 apply plugin: 'com.replaymod.preprocess'
+mcVersion = project.ext.mcVersion
 
 preprocess {
     vars.put("MC", mcVersion)
@@ -71,13 +85,12 @@ preprocess {
     vars.put("FORGE", project.fabric ? 0 : 1)
 }
 
-mcVersion = project.ext.mcVersion
-
-version = "1.0"
+version = "1.1"
 group = "me.falsehonesty.asmhelper"
-archivesBaseName = "AsmHelper"
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+archivesBaseName = "AsmHelper" + project.name
+
+sourceCompatibility = targetCompatibility = 1.8
+compileJava.options.encoding = 'UTF-8'
 
 if (mcVersion >= 11400) {
     sourceSets {
@@ -104,6 +117,9 @@ if (FABRIC) {
                 }
             }
         } else {
+            if (mcVersion <= 11202) {
+                coreMod = "me.falsehonesty.asmhelper.coremod.AsmHelperLoadingPlugin"
+            }
             runDir = "run"
         }
 
@@ -140,20 +156,6 @@ if (FABRIC) {
             ][mcVersion]
         }
     }
-}
-
-repositories {
-    mavenCentral()
-    jcenter()
-    maven {
-        name = "kryonet"
-        url = "http://clojars.org/repo/"
-    }
-    maven {
-        url 'https://repository.apache.org/content/repositories/releases/org/apache/xmlgraphics/'
-    }
-    maven { url 'https://jitpack.io' }
-    maven { url "https://repo.sk1er.club/repository/maven-public" }
 }
 
 dependencies {
@@ -209,24 +211,41 @@ dependencies {
 }
 
 processResources {
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.mcVersion
-
     from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-
-        expand 'version':project.version, 'mcversion':project.mcVersion
+        include "mcmod.info"
     }
 
     from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
+        exclude "mcmod.info"
+        exclude "mods.toml"
+        exclude "META-INF/mods.toml"
     }
 }
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+}
+
 jar {
+    exclude 'META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'module-info.class'
+
+    exclude('com/example/examplemod/**')
+    exclude("META-INF/mods.toml")
+    exclude("mods.toml")
+//    exclude("kotlin/**")
     manifest {
-        attributes "ModSide": "CLIENT"
+        attributes(
+                'FMLModType': 'LIBRARY',
+                'ModSide': 'CLIENT'
+        )
     }
 }
+
 configurations {
     provided
     // Make compile extend from our provided configuration so that things added to bundled end up on the compile classpath
@@ -235,18 +254,8 @@ configurations {
 sourceSets {
     main {
         kotlin {
-            exclude 'me/falsehonesty/asmhelper/example/**'
+//            exclude 'me/falsehonesty/asmhelper/example/**'
             exclude 'me/falsehonesty/asmhelpermod/**'
         }
     }
-}
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.kotlin
-}
-
-
-artifacts {
-    archives sourcesJar
 }

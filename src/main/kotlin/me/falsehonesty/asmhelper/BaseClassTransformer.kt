@@ -1,15 +1,25 @@
 package me.falsehonesty.asmhelper
 
+//#if MC<=11202
 import me.falsehonesty.asmhelper.AsmHelper.logger
 import net.minecraft.launchwrapper.IClassTransformer
 import net.minecraft.launchwrapper.LaunchClassLoader
-import org.apache.logging.log4j.LogManager
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.ClassNode
 
 abstract class BaseClassTransformer : IClassTransformer {
+//#else
+//$$ abstract class BaseClassTransformer {
+//#endif
+    /**
+     * This is where you would place all of your asm helper dsl magic
+     *
+     */
+    abstract fun makeTransformers()
+
+//#if MC<=11202
     private var calledSetup = false
 
     private fun setup() {
@@ -34,12 +44,6 @@ abstract class BaseClassTransformer : IClassTransformer {
     }
 
     protected open fun setup(classLoader: LaunchClassLoader) {}
-
-    /**
-     * This is where you would place all of your asm helper dsl magic
-     *
-     */
-    abstract fun makeTransformers()
 
     override fun transform(name: String?, transformedName: String?, basicClass: ByteArray?): ByteArray? {
         if (basicClass == null) return null
@@ -87,4 +91,5 @@ abstract class BaseClassTransformer : IClassTransformer {
     private fun loadClassResource(name: String): ByteArray {
         return this::class.java.classLoader.getResourceAsStream(name).readBytes()
     }
+//#endif
 }
