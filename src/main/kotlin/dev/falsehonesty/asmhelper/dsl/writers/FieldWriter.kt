@@ -27,7 +27,7 @@ class FieldWriter(
         return "FieldWriter{className=$className, fieldName=$fieldName}"
     }
 
-    class Builder {
+    class Builder : AsmWriter.AsmWriterBuilder() {
         var className: String? = null
         var accessTypes: List<AccessType> = listOf()
         var fieldName: String? = null

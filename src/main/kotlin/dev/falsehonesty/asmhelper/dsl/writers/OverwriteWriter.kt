@@ -46,7 +46,7 @@ class OverwriteWriter(
         return "OverwriteWriter{className=$className, methodName=$methodName}"
     }
 
-    class Builder {
+    class Builder : AsmWriter.AsmWriterBuilder() {
         lateinit var className: String
         lateinit var methodName: String
         lateinit var methodDesc: String

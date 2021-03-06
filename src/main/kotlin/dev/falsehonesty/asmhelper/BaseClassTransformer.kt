@@ -14,6 +14,17 @@ abstract class BaseClassTransformer : IClassTransformer {
 //#else
 //$$ abstract class BaseClassTransformer {
 //#endif
+    val mcVersion =
+        //#if MC==10809
+        10809
+        //#elseif MC==11202
+        //$$ 11202
+        //#elseif MC==11502
+        //$$ 11502
+        //#else
+        //$$ 11602
+        //#endif
+
     /**
      * This is where you would place all of your asm helper dsl magic
      *

@@ -76,7 +76,7 @@ class InjectWriter(
         return "InjectWriter{className=$className, methodName=$methodName, methodDesc=$methodDesc, at=$at}"
     }
 
-    class Builder {
+    class Builder : AsmWriter.AsmWriterBuilder() {
         lateinit var className: String
         lateinit var methodName: String
         lateinit var methodDesc: String

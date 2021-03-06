@@ -206,7 +206,7 @@ object TestObj {
     private fun injectPrintInGameLoop() = inject {
         className = "net.minecraft.client.Minecraft"
         methodName = "runGameLoop"
-        methodDesc = "(Z)V"
+        methodDesc = if (mcVersion <= 11202) "()V" else "(Z)V"
         at = At(InjectionPoint.HEAD)
 
         insnList {

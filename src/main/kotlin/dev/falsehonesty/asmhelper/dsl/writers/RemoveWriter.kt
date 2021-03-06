@@ -44,7 +44,7 @@ class RemoveWriter(
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
-    class Builder {
+    class Builder : AsmWriter.AsmWriterBuilder() {
         var className: String? = null
         var methodName: String? = null
         var methodDesc: String? = null
