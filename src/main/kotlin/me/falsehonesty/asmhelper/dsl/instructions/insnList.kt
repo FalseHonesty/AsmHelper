@@ -34,11 +34,15 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
 
     fun bipush(value: Int) = apply { insn(IntInsnNode(BIPUSH, value)) }
 
+    fun bnewarray(length: Int? = null) = apply { newarray(T_BYTE, length) }
+
     fun caload() = apply { insn(InsnNode(CALOAD)) }
 
     fun castore() = apply { insn(InsnNode(CALOAD)) }
 
     fun checkcast(type: String) = apply { insn(TypeInsnNode(CHECKCAST, type)) }
+
+    fun cnewarray(length: Int? = null) = apply { newarray(T_CHAR, length) }
 
     fun d2f() = apply { insn(InsnNode(D2F)) }
 
@@ -67,6 +71,8 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
     fun dmul() = apply { insn(InsnNode(DMUL)) }
 
     fun dneg() = apply { insn(InsnNode(DNEG)) }
+
+    fun dnewarray(length: Int? = null) = apply { newarray(T_DOUBLE, length) }
 
     fun drem() = apply { insn(InsnNode(DREM)) }
 
@@ -117,6 +123,8 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
     fun fmul() = apply { insn(InsnNode(FMUL)) }
 
     fun fneg() = apply { insn(InsnNode(FNEG)) }
+
+    fun fnewarray(length: Int? = null) = apply { newarray(T_FLOAT, length) }
 
     fun frem() = apply { insn(InsnNode(FREM)) }
 
@@ -170,6 +178,8 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
 
     fun ineg() = apply { insn(InsnNode(INEG)) }
 
+    fun inewarray(length: Int? = null) = apply { newarray(T_INT, length) }
+
     fun instanceof(clazzName: String) = apply { insn(TypeInsnNode(INSTANCEOF, clazzName)) }
 
     fun ior() = apply { insn(InsnNode(IOR)) }
@@ -220,6 +230,8 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
 
     fun lneg() = apply { insn(InsnNode(LNEG)) }
 
+    fun lnewarray(length: Int? = null) = apply { newarray(T_LONG, length) }
+
     fun lor() = apply { insn(InsnNode(LOR)) }
 
     fun lrem() = apply { insn(InsnNode(LREM)) }
@@ -254,21 +266,7 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
         insn(IntInsnNode(NEWARRAY, type))
     }
 
-    fun bnewarray(length: Int? = null) = apply { newarray(T_BYTE, length) }
-
-    fun cnewarray(length: Int? = null) = apply { newarray(T_CHAR, length) }
-
-    fun dnewarray(length: Int? = null) = apply { newarray(T_DOUBLE, length) }
-
-    fun fnewarray(length: Int? = null) = apply { newarray(T_FLOAT, length) }
-
-    fun inewarray(length: Int? = null) = apply { newarray(T_INT, length) }
-
-    fun lnewarray(length: Int? = null) = apply { newarray(T_LONG, length) }
-
-    fun snewarray(length: Int? = null) = apply { newarray(T_SHORT, length) }
-
-    fun znewarray(length: Int? = null) = apply { newarray(T_BOOLEAN, length) }
+    fun nop() = apply { insn(InsnNode(NOP)) }
 
     fun pop() = apply { insn(InsnNode(POP)) }
 
@@ -282,7 +280,11 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
 
     fun sipush(value: Int) = apply { insn(IntInsnNode(SIPUSH, value)) }
 
+    fun snewarray(length: Int? = null) = apply { newarray(T_SHORT, length) }
+
     fun swap() = apply { insn(InsnNode(SWAP)) }
+
+    fun znewarray(length: Int? = null) = apply { newarray(T_BOOLEAN, length) }
 
     /**
      * Creates a new label, but does not place it anywhere in the bytecode,
@@ -594,6 +596,37 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
         invoke(InvokeType.INTERFACE, owner, name, desc, arguments)
     }
 
+    @JvmOverloads
+    fun handle(tag: Int, owner: String, name: String, desc: String): Handle {
+        val realName = AsmHelper.remapper.mapInvocation(name)
+        return Handle(tag, owner, name, desc)
+    }
+
+    @JvmOverloads
+    fun invokeDynamic(
+        owner: String,
+        name: String,
+        desc: String,
+        bootstrapMethod: Handle,
+        vararg bootstrapConstantArgs: Any,
+        arguments: (InsnListBuilder.() -> Unit)? = null
+    ) = apply {
+        val realName = AsmHelper.remapper.mapInvocation(name)
+
+        if (arguments != null) {
+            val insns = InsnListBuilder(toInjectInto)
+            insns.arguments()
+            insnList.add(insns.build())
+        }
+
+        insnList.add(InvokeDynamicInsnNode(
+            realName,
+            desc,
+            bootstrapMethod,
+            bootstrapConstantArgs
+        ))
+    }
+
     /**
      * Calls a specified method.
      *
@@ -626,19 +659,6 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
                 type == InvokeType.INTERFACE
             )
         )
-    }
-
-    fun indyHandle(type: Int, owner: String, name: String, desc: String): Handle {
-        return Handle(type, owner, name, desc)
-    }
-
-    fun invokeDynamic(name: String, desc: String, handle: Handle, vararg bootstrapArgs: Any?) = apply {
-        insn(InvokeDynamicInsnNode(
-            name,
-            desc,
-            handle,
-            *bootstrapArgs
-        ))
     }
 
     /**
@@ -873,17 +893,17 @@ class IfElseBuilder(val methodNode: MethodNode) {
 }
 
 enum class FieldAction(val opcode: Int) {
-    GET_STATIC(Opcodes.GETSTATIC),
-    PUT_STATIC(Opcodes.PUTSTATIC),
-    GET_FIELD(Opcodes.GETFIELD),
-    PUT_FIELD(Opcodes.PUTFIELD)
+    GET_STATIC(GETSTATIC),
+    PUT_STATIC(PUTSTATIC),
+    GET_FIELD(GETFIELD),
+    PUT_FIELD(PUTFIELD)
 }
 
 enum class InvokeType(val opcode: Int) {
-    VIRTUAL(Opcodes.INVOKEVIRTUAL),
-    SPECIAL(Opcodes.INVOKESPECIAL),
-    STATIC(Opcodes.INVOKESTATIC),
-    INTERFACE(Opcodes.INVOKEINTERFACE)
+    VIRTUAL(INVOKEVIRTUAL),
+    SPECIAL(INVOKESPECIAL),
+    STATIC(INVOKESTATIC),
+    INTERFACE(INVOKEINTERFACE)
 }
 
 data class Local(val index: Int, val type: LocalType)
