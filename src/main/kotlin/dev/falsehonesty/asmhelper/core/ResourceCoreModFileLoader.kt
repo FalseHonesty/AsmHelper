@@ -1,4 +1,4 @@
-package dev.falsehonesty.asmhelper.coremod
+package dev.falsehonesty.asmhelper.core
 
 //#if MC>=11502
 //$$ import net.minecraftforge.forgespi.coremod.ICoreModFile

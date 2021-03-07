@@ -118,7 +118,7 @@ if (FABRIC) {
             }
         } else {
             if (mcVersion <= 11202) {
-                coreMod = "dev.falsehonesty.asmhelper.coremod.AsmHelperLoadingPlugin"
+                coreMod = "dev.falsehonesty.asmhelper.core.AsmHelperLoadingPlugin"
             }
             runDir = "run"
         }
