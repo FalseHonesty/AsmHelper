@@ -47,15 +47,26 @@ abstract class AsmWriter(val className: String) {
     }
 
     abstract class AsmWriterBuilder {
-        val mcVersion =
+        val fullMcVersion =
             //#if MC==10809
             10809
-            //#elseif MC==11202
-            //$$ 11202
-            //#elseif MC==11502
-            //$$ 11502
-            //#else
-            //$$ 11605
-            //#endif
+        //#elseif MC==11202
+        //$$ 11202
+        //#elseif MC==11502
+        //$$ 11502
+        //#else
+        //$$ 11604
+        //#endif
+
+        val mcVersion =
+            //#if MC==10809
+            8
+        //#elseif MC==11202
+        //$$ 12
+        //#elseif MC==11502
+        //$$ 15
+        //#else
+        //$$ 16
+        //#endif
     }
 }
