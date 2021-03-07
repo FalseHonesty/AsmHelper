@@ -50,6 +50,7 @@ buildscript {
 }
 
 apply plugin: "kotlin"
+apply plugin: 'maven-publish'
 
 repositories {
     mavenCentral()
@@ -251,11 +252,55 @@ configurations {
     // Make compile extend from our provided configuration so that things added to bundled end up on the compile classpath
     compile.extendsFrom(provided)
 }
+
 sourceSets {
     main {
         kotlin {
 //            exclude 'dev/falsehonesty/asmhelper/example/**'
             exclude 'dev/falsehonesty/asmhelpermod/**'
+        }
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId = "AsmHelper"
+
+            def branchStr = this.properties.getOrDefault("branch", "master") != "master" ? this.properties.getOrDefault("branch", "master") + "-" : ""
+            def fabricStr = FABRIC ? "-fabric" : ""
+            def snapshotStr = this.properties.getOrDefault("IS_CI", false) ? "-SNAPSHOT" : ""
+            version = "$branchStr${project.version}-$mcVersion$fabricStr$snapshotStr"
+
+            pom.withXml {
+                def dependenciesNode = asNode().appendNode('dependencies')
+
+                configurations.implementation.allDependencies.each {
+                    if (it.group != null && it.name != null && it.name != "forge" && it.version != null) {
+                        def dependencyNode = dependenciesNode.appendNode('dependency')
+                        dependencyNode.appendNode('groupId', it.group)
+                        dependencyNode.appendNode('artifactId', it.name)
+                        dependencyNode.appendNode('version', it.version)
+                    }
+                }
+            }
+
+            artifact jar
+            artifact sourcesJar
+        }
+    }
+
+    if (project.hasProperty("nexus_user") && project.hasProperty("nexus_password")) {
+        repositories {
+            maven {
+                name 'nexus'
+                url "https://repo.sk1er.club/repository/maven-${this.properties.getOrDefault("IS_CI", false) ? "snapshots" : "releases"}/"
+
+                credentials {
+                    username project.nexus_user
+                    password project.nexus_password
+                }
+            }
         }
     }
 }
