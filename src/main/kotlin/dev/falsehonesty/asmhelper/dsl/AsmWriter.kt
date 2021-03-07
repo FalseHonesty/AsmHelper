@@ -55,7 +55,7 @@ abstract class AsmWriter(val className: String) {
             //#elseif MC==11502
             //$$ 11502
             //#else
-            //$$ 11602
+            //$$ 11605
             //#endif
     }
 }

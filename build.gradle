@@ -152,7 +152,7 @@ if (FABRIC) {
         } else {
             mappings channel: 'snapshot', version: [
                     11502: '20200220-1.15.1',
-                    11602: '20200723-1.16.1'
+                    11604: '20201028-1.16.3'
             ][mcVersion]
         }
     }
@@ -205,7 +205,7 @@ dependencies {
         minecraft 'net.minecraftforge:forge:' + [
                 11404: '1.14.4-28.1.113',
                 11502: '1.15.2-31.1.18',
-                11602: '1.16.2-33.0.58'
+                11604: '1.16.4-35.0.2'
         ][mcVersion]
     }
 }
