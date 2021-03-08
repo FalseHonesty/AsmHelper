@@ -28,6 +28,9 @@ object AsmHelper {
     val remapper: Remapper
     var verbose = System.getProperty("asmhelper.verbose", "false").toBoolean()
 
+    var isDeobf: Boolean
+        private set
+
     internal var fieldMaps = mapOf<String, String>()
     internal var methodMaps = mapOf<String, String>()
 
@@ -51,10 +54,15 @@ object AsmHelper {
             null
         }
 
+        isDeobf = fmlDeobf == true
+
         remapper = when {
             fmlDeobf == true -> DeobfRemapper()
             fmlDeobf == false -> ForgeRemapper()
-            System.getProperty("asmhelper.deobf", "false")!!.toBoolean() -> DeobfRemapper()
+            System.getProperty("asmhelper.deobf", "false")!!.toBoolean() -> {
+                isDeobf = true
+                DeobfRemapper()
+            }
             else -> NotchRemapper()
         }
 
