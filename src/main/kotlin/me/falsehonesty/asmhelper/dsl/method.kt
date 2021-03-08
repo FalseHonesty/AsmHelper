@@ -67,6 +67,6 @@ fun remove(config: RemoveWriter.Builder.() -> Unit) {
  * There are no guarantees on the nature of the modification that will take place, it is up
  * to the caller.
  */
-fun modify(className: String, modifyAction: (ClassNode) -> Unit) {
+fun modify(className: String, modifyAction: GeneralModificationWriter.GeneralModificationDSL.(ClassNode) -> Unit) {
     AsmHelper.asmWriters.add(GeneralModificationWriter(className, modifyAction))
 }
