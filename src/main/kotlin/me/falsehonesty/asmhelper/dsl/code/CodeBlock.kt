@@ -19,4 +19,13 @@ class CodeBlock {
     inline fun <reified R, P1, P2> shadowMethod(p1: P1? = null, p2: P2? = null): (P1, P2) -> R = { _, _ -> null as R }
 
     inline fun <reified R, P1, P2, P3> shadowMethod(p1: P1? = null, p2: P2? = null, p3: P3? = null): (P1, P2, P3) -> R = { _, _, _ -> null as R }
+
+    companion object {
+        fun methodReturn() {}
+        fun aReturn(obj: Any?) {}
+        fun iReturn(num: Int) {}
+        fun lReturn(num: Long) {}
+        fun fReturn(num: Float) {}
+        fun dReturn(num: Double) {}
+    }
 }
