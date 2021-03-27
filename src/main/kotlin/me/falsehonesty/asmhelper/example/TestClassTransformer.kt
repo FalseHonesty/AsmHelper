@@ -2,6 +2,8 @@ package me.falsehonesty.asmhelper.example
 
 import me.falsehonesty.asmhelper.BaseClassTransformer
 import me.falsehonesty.asmhelper.dsl.*
+import me.falsehonesty.asmhelper.dsl.code.CodeBlock.Companion.aReturn
+import me.falsehonesty.asmhelper.dsl.code.CodeBlock.Companion.methodReturn
 import me.falsehonesty.asmhelper.dsl.instructions.*
 import me.falsehonesty.asmhelper.dsl.writers.AccessType
 import me.falsehonesty.asmhelper.dsl.writers.asm
@@ -54,6 +56,7 @@ class TestClassTransformer : BaseClassTransformer() {
         codeBlock {
             val deleteChatLine = shadowMethod<Unit, Int>()
             val printChatMessageWithOptionalDeletion = shadowMethod<Unit, IChatComponent, Int>()
+            // TODO: Can we make the name custom and then pass index to shadowLocal?
             val local1 = shadowLocal<IChatComponent>()
 
             code {
@@ -62,10 +65,7 @@ class TestClassTransformer : BaseClassTransformer() {
                 if (local1.unformattedText.contains("ee")) {
                     printChatMessageWithOptionalDeletion(local1, 1337)
 
-                    // TODO: provide api to return from target method
-                    asm {
-                        methodReturn()
-                    }
+                    methodReturn()
                 }
             }
         }
