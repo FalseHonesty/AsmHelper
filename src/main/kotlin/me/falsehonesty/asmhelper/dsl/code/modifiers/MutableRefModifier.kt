@@ -22,15 +22,25 @@ class MutableRefModifier(val codeBlockMethodNode: MethodNode, val codeBlockClass
                 }
 
                 val refType = node.desc.substring(1, node.desc.length - 1)
+                val writeNode = locateRefWrite(node, instructions, refType)
+
+                // It may have been changed when locating the write node!
+                if (node.desc.contains(refType)) {
+                    val descriptor = getDescriptorForRefType(refType)!!
+                    node.desc = descriptor
+                }
+
+                var hasRead = false
 
                 if (next.opcode == Opcodes.GETFIELD && (next as FieldInsnNode).owner == refType) {
-                    modifyRead(node, instructions)
+                    hasRead = true
+                    modifyRead(next, instructions, writeNode)
                     allowedActions--
                 }
 
                 if (allowedActions > 0) {
                     // Written to in the future.
-                    val writeNode = locateRefWrite(node, instructions, refType) ?: run {
+                    if (writeNode == null) {
                         logger.error("Couldn't locate write node for $node")
                         return
                     }
@@ -41,36 +51,39 @@ class MutableRefModifier(val codeBlockMethodNode: MethodNode, val codeBlockClass
                     val possibleRead = writeNode.next ?: continue
                     if (possibleRead.opcode == Opcodes.GETFIELD && (possibleRead as FieldInsnNode).owner == refType && allowedActions > 0) {
                         copyReadWrite(possibleRead, node)
+                        hasRead = true
+                    }
+
+                    if (!hasRead) {
+                        val prev = node.previous
+                        if (prev.opcode == Opcodes.ALOAD && prev is VarInsnNode) {
+                            if (node.name.substring(1).matches("local\\d+".toRegex()))
+                                instructions.remove(prev)
+                        }
+
+                        instructions.remove(node)
                     }
                 }
             }
         }
     }
 
-    private fun modifyRead(node: FieldInsnNode, instructions: InsnList) {
+    private fun modifyRead(readNode: FieldInsnNode, instructions: InsnList, writeNode: FieldInsnNode?) {
         /*
         GETFIELD me/falsehonesty/asmhelper/example/TestClassTransformer$injectCountPrint$1$1$1.$mutableObj : Lkotlin/jvm/internal/Ref$ObjectRef;
-        GETFIELD kotlin/jvm/internal/Ref$ObjectRef.element : Ljava/lang/Object;
-        CHECKCAST net/minecraft/util/IChatComponent
+        GETFIELD kotlin/jvm/internal/Ref$ObjectRef.element : Ljava/lang/Object; <---- READ_NODE
+        CHECKCAST net/minecraft/util/IChatComponent <---- ONLY FOR NON-OBJECT ObjectRefs
          */
 
-        val refType = node.desc.substring(25, node.desc.length - 1)
-        if (refType == "ObjectRef") {
-            instructions.remove(node.next)
-            val cast = node.next
+        if (readNode.owner == "kotlin/jvm/internal/Ref\$ObjectRef") {
+            val cast = readNode.next
             if (cast is TypeInsnNode && cast.opcode == Opcodes.CHECKCAST) {
-                node.desc = cast.desc
+                (readNode.previous as FieldInsnNode).desc = cast.desc
                 instructions.remove(cast)
-            } else {
-                node.desc = "Ljava/lang/Object;"
-            }
-        } else {
-            val descriptor = getDescriptorForRefType(refType)
-            if (descriptor != null) {
-                instructions.remove(node.next)
-                node.desc = descriptor
             }
         }
+
+        instructions.remove(readNode)
     }
 
     private fun getDescriptorForRefType(refType: String): String? {
@@ -97,8 +110,15 @@ class MutableRefModifier(val codeBlockMethodNode: MethodNode, val codeBlockClass
 
             if (currentNode is FieldInsnNode && currentNode.opcode == Opcodes.PUTFIELD && currentNode.owner == refType) {
                 val analyzed = analyzer.analyze(node, currentNode)
-                if (analyzed.size == 1 && analyzed.first.descriptor == getDescriptorForRefType(refType.substring(24)))
+                if (analyzed.size == 1 && analyzed.first.descriptor == getDescriptorForRefType(refType.substring(24))) {
                     return currentNode
+                }
+
+                if (analyzed.size == 2 && analyzed.last.descriptor.contains(refType)) {
+                    if (refType == "kotlin/jvm/internal/Ref\$ObjectRef")
+                        node.desc = analyzed.first.descriptor
+                    return currentNode
+                }
             }
         }
 
