@@ -58,10 +58,10 @@ class Analyzer(val instructions: InsnList, val methodNode: MethodNode) {
             when (node) {
                 is MethodInsnNode -> {
                     repeat(Type.getArgumentTypes(node.desc).size) {
-                        verbose("Popping ${stack.pop()} off the stack because it is an argument")
+                        verbose("Popping ${stack.poll()} off the stack because it is an argument")
                     }
 
-                    if (node.opcode != Opcodes.INVOKESTATIC) verbose("Popping receiver ${stack.pop()}")
+                    if (node.opcode != Opcodes.INVOKESTATIC) verbose("Popping receiver ${stack.poll()}")
 
                     val returnType = Type.getReturnType(node.desc)
                     if (returnType != Type.VOID_TYPE) stack.push(returnType)
@@ -77,11 +77,13 @@ class Analyzer(val instructions: InsnList, val methodNode: MethodNode) {
                         Opcodes.GETSTATIC -> stack.push(Type.getType(node.desc))
                         Opcodes.PUTSTATIC -> stack.pop()
                         Opcodes.GETFIELD -> {
-                            stack.pop()
+                            // since we can start analyzing at any arbitrary node, if there is no receiver on the stack
+                            // we will attempt to gracefully handle it.
+                            stack.poll()
                             stack.push(Type.getType(node.desc))
                         }
                         Opcodes.PUTFIELD -> {
-                            stack.pop()
+                            stack.poll()
                             stack.pop()
                         }
                     }

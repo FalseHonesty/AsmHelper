@@ -1,9 +1,12 @@
 package me.falsehonesty.asmhelper.dsl.code.modifiers
 
 import org.objectweb.asm.Opcodes
-import org.objectweb.asm.tree.*
+import org.objectweb.asm.tree.FieldInsnNode
+import org.objectweb.asm.tree.InsnList
+import org.objectweb.asm.tree.InsnNode
+import org.objectweb.asm.tree.MethodInsnNode
 
-class CodeBlockShortcutModifier(val targetMethodNode: MethodNode) : Modifier() {
+class CodeBlockShortcutModifier : Modifier() {
     override fun modify(instructions: InsnList) {
         for (node in instructions) {
             if (node is FieldInsnNode && node.owner == "me/falsehonesty/asmhelper/dsl/code/CodeBlock" && node.name == "Companion")
