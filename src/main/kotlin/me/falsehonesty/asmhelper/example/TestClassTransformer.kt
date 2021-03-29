@@ -1,11 +1,8 @@
 package me.falsehonesty.asmhelper.example
 
 import me.falsehonesty.asmhelper.BaseClassTransformer
-import me.falsehonesty.asmhelper.dsl.At
-import me.falsehonesty.asmhelper.dsl.InjectionPoint
-import me.falsehonesty.asmhelper.dsl.applyField
+import me.falsehonesty.asmhelper.dsl.*
 import me.falsehonesty.asmhelper.dsl.code.CodeBlock.Companion.methodReturn
-import me.falsehonesty.asmhelper.dsl.inject
 import me.falsehonesty.asmhelper.dsl.instructions.Descriptor
 import me.falsehonesty.asmhelper.dsl.instructions.FieldAction
 import me.falsehonesty.asmhelper.dsl.instructions.InvokeType
@@ -187,21 +184,18 @@ class TestClassTransformer : BaseClassTransformer() {
         }
     }
 
-//    private fun injectDrawSplashScreen() = overwrite {
-//        className = "net.minecraft.client.Minecraft"
-//        methodName = "drawSplashScreen"
-//        methodDesc = "(Lnet/minecraft/client/renderer/texture/TextureManager;)V"
-//
-//        insnList {
-//            invokeKOBjectFunction(
-//                "me/falsehonesty/asmhelper/example/TestHelper",
-//                "drawSplash",
-//                "()V"
-//            )
-//
-//            methodReturn()
-//        }
-//    }
+   private fun injectDrawSplashScreen() = overwrite {
+       className = "net.minecraft.client.Minecraft"
+       methodName = "drawSplashScreen"
+       methodDesc = "(Lnet/minecraft/client/renderer/texture/TextureManager;)V"
+
+       codeBlock {
+           code {
+               TestHelper.drawSplash()
+               methodReturn()
+           }
+       }
+   }
 }
 
 object TestObj {
