@@ -33,12 +33,20 @@ class TestClassTransformer : BaseClassTransformer() {
         at = At(InjectionPoint.HEAD)
 
         codeBlock {
-            var local1 = shadowLocal<IChatComponent>()
+            val superDrawHorizontalLine = shadowMethod<Unit, Int, Int, Int, Int>()
 
             code {
-                local1 = ChatComponentText("You prolly like girls!")
+                superDrawHorizontalLine(0, 100, 5, 0x7FFFFFFF)
             }
         }
+
+        // codeBlock {
+        //     var local1 = shadowLocal<IChatComponent>()
+        //
+        //     code {
+        //         local1 = ChatComponentText("You prolly like girls!")
+        //     }
+        // }
 
         // codeBlock {
         //     var testMessagesSent = shadowField<Int>()
