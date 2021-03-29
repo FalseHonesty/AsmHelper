@@ -2,20 +2,19 @@ package me.falsehonesty.asmhelper.dsl.writers
 
 import me.falsehonesty.asmhelper.AsmHelper
 import me.falsehonesty.asmhelper.dsl.AsmWriter
+import me.falsehonesty.asmhelper.dsl.code.CodeBlock
 import me.falsehonesty.asmhelper.dsl.instructions.InsnListBuilder
-import me.falsehonesty.asmhelper.remapping.ForgeRemapper
-import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.ClassNode
-import org.objectweb.asm.tree.InsnList
 import org.objectweb.asm.tree.MethodNode
 
 class OverwriteWriter(
     className: String,
     private val methodName: String,
     private val methodDesc: String,
-    private val insnList: InsnListBuilder.() -> Unit,
+    private val insnListBuilder: (InsnListBuilder.() -> Unit)?,
+    private val codeBlockClassName: String?,
     private val fieldMaps: Map<String, String>,
     private val methodMaps: Map<String, String>
 ) : AsmWriter(className) {
@@ -29,20 +28,18 @@ class OverwriteWriter(
 
                 remappedDesc == methodDesc && (remapped == methodName || methodMaps[remapped] == methodName)
             }
-            ?.let { overwriteMethod(it) }
+            ?.let { overwriteMethod(it, classNode) }
     }
 
-    private fun overwriteMethod(node: MethodNode) {
-        node.instructions.clear()
-        node.exceptions.clear()
-        node.tryCatchBlocks.clear()
+    private fun overwriteMethod(method: MethodNode, classNode: ClassNode) {
+        method.instructions.clear()
+        method.exceptions.clear()
+        method.tryCatchBlocks.clear()
 
-        val builder = InsnListBuilder(node)
-        builder.insnList()
+        val instructions = transformToInstructions(insnListBuilder, codeBlockClassName, method, classNode) ?: return
 
-        node.maxLocals = Type.getArgumentTypes(node.desc).size + (if (node.access and Opcodes.ACC_STATIC == 0) 1 else 0)
-
-        node.instructions.add(builder.build())
+        method.maxLocals = Type.getArgumentTypes(method.desc).size + (if (method.access and Opcodes.ACC_STATIC == 0) 1 else 0)
+        method.instructions.add(instructions)
     }
 
     override fun toString(): String {
@@ -53,7 +50,8 @@ class OverwriteWriter(
         lateinit var className: String
         lateinit var methodName: String
         lateinit var methodDesc: String
-        lateinit var insnListData: InsnListBuilder.() -> Unit
+        private var insnListBuilder: (InsnListBuilder.() -> Unit)? = null
+        private var codeBlockClassName: String? = null
         var fieldMaps = mapOf<String, String>()
         var methodMaps = mapOf<String, String>()
 
@@ -61,13 +59,17 @@ class OverwriteWriter(
         fun build(): AsmWriter {
             return OverwriteWriter(
                 className, methodName, methodDesc,
-                insnListData,
+                insnListBuilder, codeBlockClassName,
                 fieldMaps, methodMaps
             )
         }
 
         fun insnList(config: InsnListBuilder.() -> Unit) {
-            this.insnListData = config
+            this.insnListBuilder = config
+        }
+
+        fun codeBlock(code: CodeBlock.() -> Unit) {
+            this.codeBlockClassName = code.javaClass.name + "$1"
         }
     }
 }

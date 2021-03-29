@@ -5,11 +5,9 @@ import me.falsehonesty.asmhelper.AsmHelper.logger
 import me.falsehonesty.asmhelper.dsl.AsmWriter
 import me.falsehonesty.asmhelper.dsl.At
 import me.falsehonesty.asmhelper.dsl.code.CodeBlock
-import me.falsehonesty.asmhelper.dsl.code.InjectCodeBuilder
 import me.falsehonesty.asmhelper.dsl.instructions.InsnListBuilder
 import me.falsehonesty.asmhelper.printing.prettyString
 import me.falsehonesty.asmhelper.printing.verbose
-import org.objectweb.asm.ClassReader
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.InsnList
@@ -42,33 +40,7 @@ class InjectWriter(
     private fun injectInsnList(method: MethodNode, classNode: ClassNode) {
         val nodes = at.getTargetedNodes(method)
 
-        val instructions = when {
-            insnListBuilder != null && codeBlockClassName != null -> {
-                logger.error("$this specifies both an insnList and a codeBlock, please pick one or the other.")
-                return
-            }
-            insnListBuilder != null -> {
-                val builder = InsnListBuilder(method)
-                insnListBuilder.let { builder.it() }
-                builder.build()
-            }
-            codeBlockClassName != null -> {
-                val clazzPath = codeBlockClassName.replace('.', '/') + ".class"
-                val clazzInputStream = javaClass.classLoader.getResourceAsStream(clazzPath)
-
-                val clazzReader = ClassReader(clazzInputStream)
-                val codeClassNode = ClassNode()
-                clazzReader.accept(codeClassNode, ClassReader.SKIP_FRAMES)
-
-                val codeBuilder = InjectCodeBuilder(codeClassNode, classNode, method)
-
-                codeBuilder.transformToInstructions()
-            }
-            else -> {
-                logger.error("$this does not have instructions to inject. You must specify an insnList or codeBlock.")
-                return
-            }
-        }
+        val instructions = transformToInstructions(insnListBuilder, codeBlockClassName, method, classNode) ?: return
 
         if (nodes.isEmpty())
             logger.error("Couldn't find any matching nodes for $this")
