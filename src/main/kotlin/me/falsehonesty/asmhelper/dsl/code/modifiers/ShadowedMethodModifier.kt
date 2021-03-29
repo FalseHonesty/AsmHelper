@@ -6,7 +6,8 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.*
 
-class ShadowedMethodModifier(codeBlockClass: String, val targetClassNode: ClassNode, val codeBlockMethod: MethodNode) : ShadowedModifier(codeBlockClass) {
+class ShadowedMethodModifier(codeBlockClass: String, val targetClassNode: ClassNode, val codeBlockMethod: MethodNode) :
+    ShadowedModifier(codeBlockClass) {
     override fun modifyFieldNode(instructions: InsnList, node: FieldInsnNode, shadowedName: String) {
         if (node.desc.contains("kotlin/jvm/functions/")) {
             // The field returns a Function lambda, this has to be a shadowed method.
@@ -42,7 +43,11 @@ class ShadowedMethodModifier(codeBlockClass: String, val targetClassNode: ClassN
         val finalCall: MethodInsnNode
 
         while (true) {
-            if (searchNode is MethodInsnNode && searchNode.itf && searchNode.name == "invoke" && node.desc.substring(1, node.desc.length - 1) == searchNode.owner) {
+            if (searchNode is MethodInsnNode && searchNode.itf && searchNode.name == "invoke" && node.desc.substring(
+                    1,
+                    node.desc.length - 1
+                ) == searchNode.owner
+            ) {
                 finalCall = searchNode
                 break
             } else if (searchNode is MethodInsnNode && searchNode.owner.startsWith("java/lang") && searchNode.name == "valueOf") {
@@ -100,14 +105,27 @@ class ShadowedMethodModifier(codeBlockClass: String, val targetClassNode: ClassN
         // TODO: Remap?
 
         // Now we want to remove all these instructions to replace them with a valid method call to the shadowed method.
-        // TODO: Implement super shadowing
-        val methodCall = MethodInsnNode(
-            Opcodes.INVOKEVIRTUAL,
-            targetClassNode.name,
-            shadowedName,
-            syntheticMethodDesc,
-            false
-        )
+        val methodCall = if (shadowedName.startsWith("super")) {
+            val methodName = shadowedName.substring(5)
+            MethodInsnNode(
+                Opcodes.INVOKESPECIAL,
+                targetClassNode.superName,
+                if (methodName.startsWith("_")) methodName.substring(1) else methodName.decapitalize(),
+                syntheticMethodDesc,
+                false
+            )
+        } else {
+            val methodName = if (shadowedName.startsWith("_super")) {
+                shadowedName.substring(1)
+            } else shadowedName
+            MethodInsnNode(
+                Opcodes.INVOKEVIRTUAL,
+                targetClassNode.name,
+                methodName,
+                syntheticMethodDesc,
+                false
+            )
+        }
 
         verbose("- ${node.prettyString()}")
         instructions.remove(node)
@@ -123,7 +141,10 @@ class ShadowedMethodModifier(codeBlockClass: String, val targetClassNode: ClassN
         verbose("- ${returnTypeIndicator.prettyString()}")
         instructions.remove(returnTypeIndicator)
 
-        if (possibleWrapperToPrim is MethodInsnNode && possibleWrapperToPrim.owner.startsWith("java/lang/") && possibleWrapperToPrim.name.endsWith("Value") && possibleWrapperToPrim.desc.startsWith("()")) {
+        if (possibleWrapperToPrim is MethodInsnNode && possibleWrapperToPrim.owner.startsWith("java/lang/") && possibleWrapperToPrim.name.endsWith(
+                "Value"
+            ) && possibleWrapperToPrim.desc.startsWith("()")
+        ) {
             // We're pretty sure this is a Wrapper -> Primitive call, so we need to remove it!
             verbose("- ${possibleWrapperToPrim.prettyString()}")
             instructions.remove(possibleWrapperToPrim)
