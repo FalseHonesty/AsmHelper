@@ -49,6 +49,36 @@ class CodeBlock {
      */
     inline fun <reified R, P1, P2, P3, P4> shadowMethod(p1: P1? = null, p2: P2? = null, p3: P3? = null, p4: P4? = null): (P1, P2, P3, P4) -> R = { _, _, _, _ -> null as R }
 
+    /**
+     * @see shadowMethod
+     */
+    inline fun <reified R, P1, P2, P3, P4, P5> shadowMethod(p1: P1? = null, p2: P2? = null, p3: P3? = null, p4: P4? = null, p5: P5? = null): (P1, P2, P3, P4, P5) -> R = { _, _, _, _, _ -> null as R }
+
+    /**
+     * @see shadowMethod
+     */
+    inline fun <reified R, P1, P2, P3, P4, P5, P6> shadowMethod(p1: P1? = null, p2: P2? = null, p3: P3? = null, p4: P4? = null, p5: P5? = null, p6: P6? = null): (P1, P2, P3, P4, P5, P6) -> R = { _, _, _, _, _, _ -> null as R }
+
+    /**
+     * @see shadowMethod
+     */
+    inline fun <reified R, P1, P2, P3, P4, P5, P6, P7> shadowMethod(p1: P1? = null, p2: P2? = null, p3: P3? = null, p4: P4? = null, p5: P5? = null, p6: P6? = null, p7: P7? = null): (P1, P2, P3, P4, P5, P6, P7) -> R = { _, _, _, _, _, _, _ -> null as R }
+
+    /**
+     * @see shadowMethod
+     */
+    inline fun <reified R, P1, P2, P3, P4, P5, P6, P7, P8> shadowMethod(p1: P1? = null, p2: P2? = null, p3: P3? = null, p4: P4? = null, p5: P5? = null, p6: P6? = null, p7: P7? = null, p8: P8? = null): (P1, P2, P3, P4, P5, P6, P7, P8) -> R = { _, _, _, _, _, _, _, _ -> null as R }
+
+    /**
+     * @see shadowMethod
+     */
+    inline fun <reified R, P1, P2, P3, P4, P5, P6, P7, P8, P9> shadowMethod(p1: P1? = null, p2: P2? = null, p3: P3? = null, p4: P4? = null, p5: P5? = null, p6: P6? = null, p7: P7? = null, p8: P8? = null, p9: P9? = null): (P1, P2, P3, P4, P5, P6, P7, P8, P9) -> R = { _, _, _, _, _, _, _, _, _ -> null as R }
+
+    /**
+     * @see shadowMethod
+     */
+    inline fun <reified R, P1, P2, P3, P4, P5, P6, P7, P8, P9, P10> shadowMethod(p1: P1? = null, p2: P2? = null, p3: P3? = null, p4: P4? = null, p5: P5? = null, p6: P6? = null, p7: P7? = null, p8: P8? = null, p9: P9? = null, p10: P10? = null): (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10) -> R = { _, _, _, _, _, _, _, _, _, _ -> null as R }
+
     companion object {
         fun methodReturn() {}
         fun aReturn(obj: Any?) {}
