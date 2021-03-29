@@ -11,6 +11,7 @@ import me.falsehonesty.asmhelper.dsl.instructions.FieldAction
 import me.falsehonesty.asmhelper.dsl.instructions.InvokeType
 import me.falsehonesty.asmhelper.dsl.instructions.JumpCondition
 import me.falsehonesty.asmhelper.dsl.writers.AccessType
+import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 import kotlin.math.abs
 
@@ -32,12 +33,20 @@ class TestClassTransformer : BaseClassTransformer() {
         at = At(InjectionPoint.HEAD)
 
         codeBlock {
-            var testMessagesSent = shadowField<Int>()
+            var local1 = shadowLocal<IChatComponent>()
 
             code {
-                println("${++testMessagesSent} messages sent so far")
+                local1 = ChatComponentText("You prolly like girls!")
             }
         }
+
+        // codeBlock {
+        //     var testMessagesSent = shadowField<Int>()
+        //
+        //     code {
+        //         println("${++testMessagesSent} messages sent so far")
+        //     }
+        // }
 
         // insnList {
         //     field(FieldAction.GET_STATIC, "java/lang/System", "out", "Ljava/io/PrintStream;")
