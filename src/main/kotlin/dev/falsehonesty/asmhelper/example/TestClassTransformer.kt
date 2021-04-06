@@ -31,6 +31,7 @@ class TestClassTransformer : BaseClassTransformer() {
         injectCountPrint()
         // injectDrawSplashScreen()
         injectEntityPlayer()
+        injectPrintInGameLoop()
 
 //        world()
     }
@@ -119,7 +120,7 @@ class TestClassTransformer : BaseClassTransformer() {
         initialValue = 0
     }
 
-    fun injectEntityPlayer() = inject {
+    private fun injectEntityPlayer() = inject {
         className = ENTITY_PLAYER
         methodName = "dropOneItem"
         methodDesc = "(Z)L$ENTITY_ITEM;"
@@ -180,27 +181,17 @@ class TestClassTransformer : BaseClassTransformer() {
         }
     }
 
-   private fun injectDrawSplashScreen() = overwrite {
-       className = "net.minecraft.client.Minecraft"
-       methodName = "drawSplashScreen"
-       methodDesc = "(Lnet/minecraft/client/renderer/texture/TextureManager;)V"
+    private fun injectDrawSplashScreen() = overwrite {
+        className = "net.minecraft.client.Minecraft"
+        methodName = "drawSplashScreen"
+        methodDesc = "(Lnet/minecraft/client/renderer/texture/TextureManager;)V"
 
-       codeBlock {
-           code {
-               TestHelper.drawSplash()
-               methodReturn()
-           }
-       }
-   }
-}
-
-object TestObj {
-    fun printWhenChatted(messages: Int) {
-        println("$messages printed so far.")
-    }
-
-    fun doThing(b: Boolean) {
-        println("open? $b")
+        codeBlock {
+            code {
+                TestHelper.printMessage()
+                methodReturn()
+            }
+        }
     }
 
     private fun injectPrintInGameLoop() = inject {

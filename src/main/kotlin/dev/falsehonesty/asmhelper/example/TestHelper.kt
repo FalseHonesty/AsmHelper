@@ -1,7 +1,7 @@
 package dev.falsehonesty.asmhelper.example
 
 object TestHelper {
-    fun drawSplash() {
+    fun printMessage() {
         println("E")
     }
 }
