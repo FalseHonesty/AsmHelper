@@ -236,6 +236,7 @@ jar {
     exclude 'META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'module-info.class'
 
     exclude('com/example/examplemod/**')
+    exclude('META-INF/services/dev.falsehonesty.asmhelper.ClassTransformationService')
     exclude("META-INF/mods.toml")
     exclude("mods.toml")
 //    exclude("kotlin/**")
