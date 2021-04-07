@@ -86,7 +86,7 @@ preprocess {
     vars.put("FORGE", project.fabric ? 0 : 1)
 }
 
-version = "1.1"
+version = this.properties.getOrDefault("BUILD_ID", "LOCAL")
 group = "dev.falsehonesty.asmhelper"
 archivesBaseName = "AsmHelper" + project.name
 
@@ -268,10 +268,9 @@ publishing {
         maven(MavenPublication) {
             artifactId = "AsmHelper"
 
-            def branchStr = this.properties.getOrDefault("branch", "master") != "master" ? this.properties.getOrDefault("branch", "master") + "-" : ""
             def fabricStr = FABRIC ? "-fabric" : ""
             def snapshotStr = this.properties.getOrDefault("IS_CI", false) ? "-SNAPSHOT" : ""
-            version = "$branchStr${project.version}-$mcVersion$fabricStr$snapshotStr"
+            version = "${project.version}-$mcVersion$fabricStr$snapshotStr"
 
             pom.withXml {
                 def dependenciesNode = asNode().appendNode('dependencies')
