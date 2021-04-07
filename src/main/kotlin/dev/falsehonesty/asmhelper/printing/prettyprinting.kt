@@ -2,6 +2,8 @@ package dev.falsehonesty.asmhelper.printing
 
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.InsnList
+
+//#if MC!=11502
 import org.objectweb.asm.util.Textifier
 import org.objectweb.asm.util.TraceMethodVisitor
 import java.io.PrintWriter
@@ -29,3 +31,7 @@ private fun textifierToString(): String {
 
     return stringWriter.toString()
 }
+//#else
+//$$ fun InsnList.prettyString(): String = ""
+//$$ fun AbstractInsnNode.prettyString(): String = ""
+//#endif
