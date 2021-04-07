@@ -1,5 +1,6 @@
 package dev.falsehonesty.asmhelper.dsl.code.modifiers
 
+import dev.falsehonesty.asmhelper.AsmHelper
 import dev.falsehonesty.asmhelper.printing.prettyString
 import dev.falsehonesty.asmhelper.printing.verbose
 import org.objectweb.asm.Opcodes
@@ -11,9 +12,7 @@ class ShadowedMethodModifier(codeBlockClass: String, val targetClassNode: ClassN
     override fun modifyFieldNode(instructions: InsnList, node: FieldInsnNode, shadowedName: String) {
         if (node.desc.contains("kotlin/jvm/functions/")) {
             // The field returns a Function lambda, this has to be a shadowed method.
-
             manipulateShadowedMethodCall(instructions, node, shadowedName)
-
             return
         }
     }
@@ -102,15 +101,14 @@ class ShadowedMethodModifier(codeBlockClass: String, val targetClassNode: ClassN
 
         verbose("Synthetic method description has been formed: $syntheticMethodDesc")
 
-        // TODO: Remap?
-
         // Now we want to remove all these instructions to replace them with a valid method call to the shadowed method.
         val methodCall = if (shadowedName.startsWith("super")) {
-            val methodName = shadowedName.substring(5)
+            val methodName = shadowedName.substring(5).let { if (it.startsWith("_")) it.substring(1) else it.decapitalize() }
+            val mappedMethodName = AsmHelper.remapper.mapInvocation(methodName)
             MethodInsnNode(
                 Opcodes.INVOKESPECIAL,
                 targetClassNode.superName,
-                if (methodName.startsWith("_")) methodName.substring(1) else methodName.decapitalize(),
+                mappedMethodName,
                 syntheticMethodDesc,
                 false
             )
@@ -118,10 +116,11 @@ class ShadowedMethodModifier(codeBlockClass: String, val targetClassNode: ClassN
             val methodName = if (shadowedName.startsWith("_super")) {
                 shadowedName.substring(1)
             } else shadowedName
+            val mappedMethodName = AsmHelper.remapper.mapInvocation(methodName)
             MethodInsnNode(
                 Opcodes.INVOKEVIRTUAL,
                 targetClassNode.name,
-                methodName,
+                mappedMethodName,
                 syntheticMethodDesc,
                 false
             )

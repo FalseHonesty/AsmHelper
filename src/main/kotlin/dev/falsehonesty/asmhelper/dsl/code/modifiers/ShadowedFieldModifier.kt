@@ -1,5 +1,6 @@
 package dev.falsehonesty.asmhelper.dsl.code.modifiers
 
+import dev.falsehonesty.asmhelper.AsmHelper
 import dev.falsehonesty.asmhelper.printing.prettyString
 import dev.falsehonesty.asmhelper.printing.verbose
 import org.objectweb.asm.tree.ClassNode
@@ -12,7 +13,7 @@ class ShadowedFieldModifier(codeBlockClass: String, val targetClassNode: ClassNo
         val prevString = node.prettyString().trim()
 
         node.owner = targetClassNode.name
-        node.name = shadowedName
+        node.name = AsmHelper.remapper.mapFieldAccess(shadowedName)
 
         verbose("$prevString --> ${node.prettyString().trim()}")
     }
