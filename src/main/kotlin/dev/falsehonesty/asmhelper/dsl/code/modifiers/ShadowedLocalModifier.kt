@@ -16,9 +16,27 @@ class ShadowedLocalModifier(codeBlockClass: String) : ShadowedModifier(codeBlock
 
             val prev = node.previous
 
-            if (prev is VarInsnNode && node.opcode == Opcodes.GETFIELD) {
+            if (prev !is VarInsnNode)
+                return
+
+
+
+            if (node.opcode == Opcodes.GETFIELD) {
+                val opcode = when (node.desc) {
+                    "I" -> Opcodes.ILOAD
+                    "B" -> Opcodes.ILOAD
+                    "S" -> Opcodes.ILOAD
+                    "C" -> Opcodes.ILOAD
+                    "Z" -> Opcodes.ILOAD
+                    "L" -> Opcodes.LLOAD
+                    "F" -> Opcodes.FLOAD
+                    "D" -> Opcodes.DLOAD
+                    else -> Opcodes.ALOAD
+                }
+
                 val prevString = prev.prettyString().trim()
                 prev.`var` = localNumber
+                prev.opcode = opcode
 
                 verbose(prev.previous.prettyString())
                 verbose("$prevString --> ${prev.prettyString().trim()}")
