@@ -4,7 +4,10 @@ import dev.falsehonesty.asmhelper.dsl.instructions.InsnListBuilder
 import dev.falsehonesty.asmhelper.printing.prettyString
 import dev.falsehonesty.asmhelper.printing.verbose
 import org.objectweb.asm.Opcodes
-import org.objectweb.asm.tree.*
+import org.objectweb.asm.tree.FieldInsnNode
+import org.objectweb.asm.tree.InsnList
+import org.objectweb.asm.tree.MethodInsnNode
+import org.objectweb.asm.tree.MethodNode
 
 class AsmBlockModifier(val targetMethodNode: MethodNode) : Modifier() {
     override fun modify(instructions: InsnList) {
@@ -48,7 +51,9 @@ class AsmBlockModifier(val targetMethodNode: MethodNode) : Modifier() {
         val constr = bytecodeClass.declaredConstructors.first()
         constr.isAccessible = true
         val asmLambda = constr.newInstance()
-        val invokeMethod = bytecodeClass.declaredMethods.first { it.isSynthetic }
+        val invokeMethod = bytecodeClass.declaredMethods.first {
+            it.parameters.size == 1 && it.parameters.first().type == InsnListBuilder::class.java
+        }
         invokeMethod.isAccessible = true
 
         val builder = InsnListBuilder(targetMethodNode)
