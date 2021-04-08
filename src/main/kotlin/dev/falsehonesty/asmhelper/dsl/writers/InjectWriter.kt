@@ -104,5 +104,3 @@ class InjectWriter(
         }
     }
 }
-
-fun asm(bytecode: InsnListBuilder.() -> Unit) {}

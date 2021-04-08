@@ -1,5 +1,7 @@
 package dev.falsehonesty.asmhelper.dsl.code
 
+import dev.falsehonesty.asmhelper.dsl.instructions.InsnListBuilder
+
 class CodeBlock {
     /**
      * The block you provide to this function is the literal code that will be written to the target.
@@ -86,5 +88,6 @@ class CodeBlock {
         fun lReturn(num: Long) {}
         fun fReturn(num: Float) {}
         fun dReturn(num: Double) {}
+        fun asm(bytecode: InsnListBuilder.() -> Unit) {}
     }
 }

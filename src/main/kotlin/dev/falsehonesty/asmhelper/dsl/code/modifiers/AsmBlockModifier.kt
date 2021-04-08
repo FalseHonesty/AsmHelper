@@ -4,15 +4,12 @@ import dev.falsehonesty.asmhelper.dsl.instructions.InsnListBuilder
 import dev.falsehonesty.asmhelper.printing.prettyString
 import dev.falsehonesty.asmhelper.printing.verbose
 import org.objectweb.asm.Opcodes
-import org.objectweb.asm.tree.FieldInsnNode
-import org.objectweb.asm.tree.InsnList
-import org.objectweb.asm.tree.MethodInsnNode
-import org.objectweb.asm.tree.MethodNode
+import org.objectweb.asm.tree.*
 
 class AsmBlockModifier(val targetMethodNode: MethodNode) : Modifier() {
     override fun modify(instructions: InsnList) {
         for (node in instructions) {
-            if (node is MethodInsnNode && node.opcode == Opcodes.INVOKESTATIC && node.name == "asm" && node.owner == "dev/falsehonesty/asmhelper/dsl/writers/InjectWriterKt") {
+            if (node is MethodInsnNode && node.opcode == Opcodes.INVOKEVIRTUAL && node.name == "asm" && node.owner == "dev/falsehonesty/asmhelper/dsl/code/CodeBlock\$Companion") {
                 modifyAsmBlock(node, instructions)
             }
         }
@@ -20,12 +17,32 @@ class AsmBlockModifier(val targetMethodNode: MethodNode) : Modifier() {
 
     private fun modifyAsmBlock(node: MethodInsnNode, instructions: InsnList) {
         /*
-        GETSTATIC me/falsehonesty/asmhelper/example/TestClassTransformer$injectCountPrint$1$1$1$1.INSTANCE : Lme/falsehonesty/asmhelper/example/TestClassTransformer$injectCountPrint$1$1$1$1;
+        GETSTATIC dev/falsehonesty/asmhelper/dsl/code/CodeBlock.Companion : Ldev/falsehonesty/asmhelper/dsl/code/CodeBlock$Companion;
+        GETSTATIC dev/falsehonesty/asmhelper/example/TestClassTransformer$injectCountPrint$1$1$1$1.INSTANCE : Ldev/falsehonesty/asmhelper/example/TestClassTransformer$injectCountPrint$1$1$1$1;
         CHECKCAST kotlin/jvm/functions/Function1
-        INVOKESTATIC me/falsehonesty/asmhelper/dsl/writers/InjectWriterKt.asm (Lkotlin/jvm/functions/Function1;)V
+        INVOKEVIRTUAL dev/falsehonesty/asmhelper/dsl/code/CodeBlock$Companion.asm (Lkotlin/jvm/functions/Function1;)V
          */
 
-        val bytecodeClassName = (node.previous.previous as FieldInsnNode).owner
+        /*
+        GETSTATIC dev/falsehonesty/asmhelper/dsl/code/CodeBlock.Companion : Ldev/falsehonesty/asmhelper/dsl/code/CodeBlock$Companion;
+        NEW dev/falsehonesty/asmhelper/example/TestClassTransformer$injectCountPrint$1$1$1$1
+        DUP
+        ALOAD 0
+        INVOKESPECIAL dev/falsehonesty/asmhelper/example/TestClassTransformer$injectCountPrint$1$1$1$1.<init> (Ldev/falsehonesty/asmhelper/example/TestClassTransformer$injectCountPrint$1$1$1;)V
+        CHECKCAST kotlin/jvm/functions/Function1
+        INVOKEVIRTUAL dev/falsehonesty/asmhelper/dsl/code/CodeBlock$Companion.asm (Lkotlin/jvm/functions/Function1;)V
+         */
+
+        val bytecodeClassName = when (val lambdaValue = node.previous.previous) {
+            is FieldInsnNode -> {
+                lambdaValue.owner
+            }
+            is MethodInsnNode -> {
+                throw IllegalArgumentException("Inline asm blocks can't capture locals")
+            }
+            else -> throw IllegalStateException("$lambdaValue isn't expected")
+        }
+
         val bytecodeClass = Class.forName(bytecodeClassName.replace("/", "."))
 
         val constr = bytecodeClass.declaredConstructors.first()

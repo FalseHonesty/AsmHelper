@@ -2,6 +2,7 @@ package dev.falsehonesty.asmhelper.example
 
 import dev.falsehonesty.asmhelper.BaseClassTransformer
 import dev.falsehonesty.asmhelper.dsl.*
+import dev.falsehonesty.asmhelper.dsl.code.CodeBlock.Companion.asm
 import dev.falsehonesty.asmhelper.dsl.code.CodeBlock.Companion.methodReturn
 import dev.falsehonesty.asmhelper.dsl.instructions.Descriptor
 import dev.falsehonesty.asmhelper.dsl.instructions.FieldAction
@@ -48,6 +49,12 @@ class TestClassTransformer : BaseClassTransformer() {
 
             code {
                 superDrawHorizontalLine(0, 100, 5, 0x7FFFFFFF)
+
+                asm {
+                    aload(0)
+                    ldc(className)
+                    pop()
+                }
             }
         }
 
