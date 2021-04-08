@@ -1,17 +1,14 @@
 package dev.falsehonesty.asmhelper.dsl.code.modifiers
 
 import org.objectweb.asm.Opcodes
-import org.objectweb.asm.tree.FieldInsnNode
-import org.objectweb.asm.tree.InsnList
-import org.objectweb.asm.tree.InsnNode
-import org.objectweb.asm.tree.MethodInsnNode
+import org.objectweb.asm.tree.*
 
 class CodeBlockShortcutModifier : Modifier() {
     override fun modify(instructions: InsnList) {
         for (node in instructions) {
-            if (node is FieldInsnNode && node.owner == "me/falsehonesty/asmhelper/dsl/code/CodeBlock" && node.name == "Companion")
+            if (node is FieldInsnNode && node.owner == "dev/falsehonesty/asmhelper/dsl/code/CodeBlock" && node.name == "Companion")
                 instructions.remove(node)
-            else if (node is MethodInsnNode && node.opcode == Opcodes.INVOKEVIRTUAL && node.owner == "me/falsehonesty/asmhelper/dsl/code/CodeBlock\$Companion")
+            else if (node is MethodInsnNode && node.opcode == Opcodes.INVOKEVIRTUAL && node.owner == "dev/falsehonesty/asmhelper/dsl/code/CodeBlock\$Companion")
                 modifyShortcut(node, instructions)
         }
     }

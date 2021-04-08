@@ -12,7 +12,7 @@ import org.objectweb.asm.tree.MethodNode
 class AsmBlockModifier(val targetMethodNode: MethodNode) : Modifier() {
     override fun modify(instructions: InsnList) {
         for (node in instructions) {
-            if (node is MethodInsnNode && node.opcode == Opcodes.INVOKESTATIC && node.name == "asm" && node.owner == "me/falsehonesty/asmhelper/dsl/writers/InjectWriterKt") {
+            if (node is MethodInsnNode && node.opcode == Opcodes.INVOKESTATIC && node.name == "asm" && node.owner == "dev/falsehonesty/asmhelper/dsl/writers/InjectWriterKt") {
                 modifyAsmBlock(node, instructions)
             }
         }
