@@ -6,6 +6,7 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.tree.*
 
+@Suppress("unused", "FunctionName", "SpellCheckingInspection", "MemberVisibilityCanBePrivate")
 open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
     val insnList = InsnList()
     var currentLocalIndex = toInjectInto.maxLocals
@@ -596,10 +597,9 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
         invoke(InvokeType.INTERFACE, owner, name, desc, arguments)
     }
 
-    @JvmOverloads
     fun handle(tag: Int, owner: String, name: String, desc: String): Handle {
         val realName = AsmHelper.remapper.mapInvocation(name)
-        return Handle(tag, owner, name, desc)
+        return Handle(tag, owner, realName, desc)
     }
 
     @JvmOverloads
@@ -688,8 +688,8 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
             throw IllegalStateException("tableswitch builder cannot contain duplicate cases.")
         }
 
-        val min = cases.map { it.index }.min()!!
-        val max = cases.map { it.index }.max()!!
+        val min = cases.minOf { it.index }
+        val max = cases.maxOf { it.index }
 
         val labels = (min..max).map { makeLabel() }
         val defaultLabel = makeLabel()

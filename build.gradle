@@ -1,17 +1,18 @@
 // For those who want the bleeding edge
 buildscript {
-    ext.kotlin_version = "1.3.72"
+    ext.kotlin_version = "1.5.21"
 
-    def mcVersion
-    def (major, minor, patch) = project.name.tokenize('-')[0].tokenize('.')
-    mcVersion = "${major}${minor.padLeft(2, '0')}${(patch ?: '').padLeft(2, '0')}" as int
+    def mcVersionStr = project.name.tokenize('-')[0]
+    def (major, minor, patch) = mcVersionStr.tokenize('.')
+    def mcVersion = "${major}${minor.padLeft(2, '0')}${(patch ?: '').padLeft(2, '0')}" as int
     def fabric = mcVersion >= 11400 && project.name.endsWith("-fabric")
     project.ext.mcVersion = mcVersion
+    project.ext.mcVersionStr = mcVersionStr
+    project.ext.mcPlatform = fabric ? 'fabric' : 'forge'
     project.ext.fabric = fabric
 
     repositories {
         mavenLocal()
-        jcenter()
         mavenCentral()
         maven {
             name = "fabric"
@@ -31,39 +32,21 @@ buildscript {
     }
     dependencies {
         if (fabric) {
-            classpath 'fabric-loom:fabric-loom.gradle.plugin:0.4-SNAPSHOT'
+            classpath 'fabric-loom:fabric-loom.gradle.plugin:0.8-SNAPSHOT'
         } else if (mcVersion >= 11400) {
-            classpath('net.minecraftforge.gradle:ForgeGradle:3.+') {
+            classpath('net.minecraftforge.gradle:ForgeGradle:5.0.5') {
                 exclude group: 'trove', module: 'trove' // preprocessor/idea requires more recent one
             }
         } else {
-            classpath('com.github.ReplayMod:ForgeGradle:' + (
-                    mcVersion >= 11200 ? 'b64de9c' : // FG 2.3
-                            mcVersion >= 10904 ? '5bb7a53' : // FG 2.2
-                                    'fc1eabc'   // FG 2.1
-            ) + ':all') {
+            def forgeGradleVersion = mcVersion >= 11200 ? '34ab703' : // FG 2.3
+                mcVersion >= 10904 ? '5d1e8d8' : // FG 2.2
+                    'd1a7165'   // FG 2.1
+            classpath("com.github.ReplayMod:ForgeGradle:$forgeGradleVersion:all") {
                 exclude group: 'net.sf.trove4j', module: 'trove4j' // preprocessor/idea requires more recent one
                 exclude group: 'trove', module: 'trove' // different name same thing
             }
         }
     }
-}
-
-apply plugin: "kotlin"
-apply plugin: 'maven-publish'
-
-repositories {
-    mavenCentral()
-    jcenter()
-    maven {
-        name = "kryonet"
-        url = "http://clojars.org/repo/"
-    }
-    maven {
-        url 'https://repository.apache.org/content/repositories/releases/org/apache/xmlgraphics/'
-    }
-    maven { url 'https://jitpack.io' }
-    maven { url "https://repo.sk1er.club/repository/maven-public" }
 }
 
 def FG3 = !fabric && mcVersion >= 11400
@@ -77,13 +60,23 @@ if (FABRIC) {
     apply plugin: 'net.minecraftforge.gradle.forge'
 }
 
+apply plugin: 'kotlin'
 apply plugin: 'com.replaymod.preprocess'
-mcVersion = project.ext.mcVersion
+apply plugin: 'maven-publish'
 
 preprocess {
     vars.put("MC", mcVersion)
     vars.put("FABRIC", project.fabric ? 1 : 0)
     vars.put("FORGE", project.fabric ? 0 : 1)
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://repository.apache.org/content/repositories/releases/org/apache/xmlgraphics/'
+    }
+    maven { url 'https://jitpack.io' }
+    maven { url "https://repo.sk1er.club/repository/maven-public" }
 }
 
 version = this.properties.getOrDefault("BUILD_ID", "LOCAL")
@@ -101,7 +94,9 @@ if (mcVersion >= 11400) {
 
 if (FABRIC) {
     minecraft {
-        autoGenIDERuns = true
+        runConfigs.all {
+            ideConfigGenerated = true
+        }
     }
 } else {
     minecraft {
@@ -126,37 +121,43 @@ if (FABRIC) {
 
         if (!FG3) {
             version = [
-                    11202: '1.12.2-14.23.0.2486',
-                    11201: '1.12.1-14.22.0.2444',
-                    11200: '1.12-14.21.1.2387',
-                    11102: '1.11.2-13.20.0.2216',
-                    11100: '1.11-13.19.1.2188',
-                    11002: '1.10.2-12.18.2.2099',
-                    10904: '1.9.4-12.17.0.1976',
-                    10809: '1.8.9-11.15.1.1722',
-                    10800: '1.8-11.14.4.1563',
-                    10710: '1.7.10-10.13.4.1558-1.7.10',
+                11202: '1.12.2-14.23.0.2486',
+                11201: '1.12.1-14.22.0.2444',
+                11200: '1.12-14.21.1.2387',
+                11102: '1.11.2-13.20.0.2216',
+                11100: '1.11-13.19.1.2188',
+                11002: '1.10.2-12.18.2.2099',
+                10904: '1.9.4-12.17.0.1976',
+                10809: '1.8.9-11.15.1.1722',
+                10800: '1.8-11.14.4.1563',
+                10710: '1.7.10-10.13.4.1558-1.7.10',
             ][mcVersion]
             mappings = [
-                    11404: "snapshot_20190719-1.14.3",
-                    11202: "snapshot_20170615",
-                    11201: "snapshot_20170615",
-                    11200: "snapshot_20170615",
-                    11102: "snapshot_20161220",
-                    11100: "snapshot_20161111",
-                    11002: "snapshot_20160518",
-                    10904: "snapshot_20160518",
-                    10809: "stable_22",
-                    10800: "snapshot_nodoc_20141130",
-                    10710: "stable_12",
+                11404: "snapshot_20190719-1.14.3",
+                11202: "snapshot_20170615",
+                11201: "snapshot_20170615",
+                11200: "snapshot_20170615",
+                11102: "snapshot_20161220",
+                11100: "snapshot_20161111",
+                11002: "snapshot_20160518",
+                10904: "snapshot_20160518",
+                10809: "stable_22",
+                10800: "snapshot_nodoc_20141130",
+                10710: "stable_12",
             ][mcVersion]
         } else {
             mappings channel: 'snapshot', version: [
-                    11502: '20200220-1.15.1',
-                    11604: '20201028-1.16.3'
+                11502: '20200220-1.15.1',
+                11602: '20201028-1.16.3',
             ][mcVersion]
         }
     }
+}
+
+configurations {
+    provided
+    // Make compile extend from our provided configuration so that things added to bundled end up on the compile classpath
+    compile.extendsFrom(provided)
 }
 
 dependencies {
@@ -164,72 +165,50 @@ dependencies {
 
     if (FABRIC) {
         minecraft 'com.mojang:minecraft:' + [
-                11404: '1.14.4',
-                11502: '1.15.2',
-                11601: '1.16.1',
-                11602: '1.16.2',
+            11404: '1.14.4',
+            11502: '1.15.2',
+            11601: '1.16.1',
+            11602: '1.16.2',
+            11701: '1.17.1',
         ][mcVersion]
         mappings 'net.fabricmc:yarn:' + [
-                11404: '1.14.4+build.16',
-                11502: '1.15.2+build.14',
-                11601: '1.16.1+build.17:v2',
-                11602: '1.16.2+build.1:v2',
+            11404: '1.14.4+build.16',
+            11502: '1.15.2+build.14',
+            11601: '1.16.1+build.17:v2',
+            11602: '1.16.2+build.47:v2',
+            11701: '1.17.1+build.39:v2',
         ][mcVersion]
-        modCompile 'net.fabricmc:fabric-loader:' + [
-                11404: '0.7.8+build.189',
-                11502: '0.7.8+build.189',
-                11601: '0.8.8+build.202',
-                11602: '0.9.1+build.205',
-        ][mcVersion]
-        def fabricApiVersion = [
-                11404: '0.4.3+build.247-1.14',
-                11502: '0.5.1+build.294-1.15',
-                11601: '0.14.0+build.371-1.16',
-                11602: '0.17.1+build.394-1.16',
-        ][mcVersion]
-        def fabricApiModules = [
-                "api-base",
-                "networking-v0",
-                "keybindings-v0",
-                "resource-loader-v0",
-        ]
-        if (mcVersion >= 11600) {
-            fabricApiModules.add("key-binding-api-v1")
-        }
-        fabricApiModules.each { module ->
-            modCompile fabricApi.module("fabric-$module", fabricApiVersion)
-            include fabricApi.module("fabric-$module", fabricApiVersion)
-        }
+        modImplementation 'net.fabricmc:fabric-loader:0.11.6'
     }
 
     if (FG3) {
         minecraft 'net.minecraftforge:forge:' + [
-                11404: '1.14.4-28.1.113',
-                11502: '1.15.2-31.1.18',
-                11604: '1.16.4-35.0.2'
+            11404: '1.14.4-28.1.113',
+            11502: '1.15.2-31.1.18',
+            11602: '1.16.2-33.0.58'
         ][mcVersion]
     }
 }
 
+// Some workaround for FG2 (don't ask me) which is not required for FG3+/Loom
+if (mcVersion <= 11202) {
+    task moveResources {
+        doLast {
+            ant.move file: "${buildDir}/resources/main",
+                todir: "${buildDir}/classes/java"
+        }
+    }
+
+    moveResources.dependsOn processResources
+    classes.dependsOn moveResources
+}
+
 processResources {
-    from(sourceSets.main.resources.srcDirs) {
-        include "mcmod.info"
+    inputs.property "version", project.version
+
+    filesMatching(['fabric.mod.json']) {
+        expand 'version': project.version
     }
-
-    from(sourceSets.main.resources.srcDirs) {
-        exclude "mcmod.info"
-        exclude "mods.toml"
-        exclude "META-INF/mods.toml"
-    }
-}
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives sourcesJar
 }
 
 jar {
@@ -242,16 +221,19 @@ jar {
 //    exclude("kotlin/**")
     manifest {
         attributes(
-                'FMLModType': 'LIBRARY',
-                'ModSide': 'CLIENT'
+            'FMLModType': 'LIBRARY',
+            'ModSide': 'CLIENT'
         )
     }
 }
 
-configurations {
-    provided
-    // Make compile extend from our provided configuration so that things added to bundled end up on the compile classpath
-    compile.extendsFrom(provided)
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
 }
 
 sourceSets {
