@@ -21,7 +21,7 @@ data class At(val value: InjectionPoint, val before: Boolean = true, val shift: 
             is InjectionPoint.HEAD -> listOf(method.instructions.first)
             is InjectionPoint.TAIL -> listOf(method.instructions.last.previous)
             is InjectionPoint.RETURN -> method.instructions.iterator().asSequence().toList().filter {
-                it.opcode == Opcodes.RETURN
+                it.opcode in Opcodes.IRETURN..Opcodes.RETURN
             }.let { if (value.ordinal != null) listOf(it[value.ordinal]) else it }
             is InjectionPoint.INVOKE -> method.instructions.iterator().asSequence().toList().filter {
                 val descriptor = value.descriptor
