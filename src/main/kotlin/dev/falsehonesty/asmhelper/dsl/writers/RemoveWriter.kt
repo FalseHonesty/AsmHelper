@@ -31,6 +31,16 @@ class RemoveWriter(
         nodes.forEach { node ->
             var toDelete = node
 
+            if (at.shift < 0) {
+                repeat(-at.shift) {
+                    toDelete = toDelete.previous
+                }
+            } else if (at.shift > 0) {
+                repeat(at.shift) {
+                    toDelete = toDelete.next
+                }
+            }
+
             repeat(numberToRemove) {
                 val tmpNode = toDelete.next
                 method.instructions.remove(toDelete)
