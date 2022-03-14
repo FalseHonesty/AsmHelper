@@ -623,7 +623,7 @@ open class InsnListBuilder(val toInjectInto: MethodNode) : Opcodes {
             realName,
             desc,
             bootstrapMethod,
-            bootstrapConstantArgs
+            *bootstrapConstantArgs
         ))
     }
 
